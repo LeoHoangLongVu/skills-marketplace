@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>CORPORATE LIGHT — poster template</title>
+<style>
+/* ============================================================
+   CORPORATE LIGHT — light, consulting-grade poster template.
+   White canvas, navy header band, semantic red/green/blue/orange
+   panels, icon cards, outcome chips, takeaway bands.
+   Genre guide: references/diagrams/poster.md
+   Swap :root to rebrand (pptx_theme.py --light drops in here).
+   ============================================================ */
+:root{
+  --bg:#ffffff; --bg2:#f3f5fa; --panel:#ffffff; --panel2:#f7f9fc;
+  --line:#dbe1ec; --line2:#c2cbdc;
+  --ink:#182238; --ink2:#3d4763; --ink3:#6f7994;
+  --navy:#141f52; --navy2:#25379b;
+  --blue:#2456c4; --green:#1d8a4b; --red:#c22f3d; --amber:#d9720f;
+  --violet:#5f46b4; --cyan:#0f7f96; --mag:#5f46b4;
+  --accent:var(--blue); --accent2:var(--green);
+  --font-head:'Segoe UI', 'Helvetica Neue', Arial, system-ui, sans-serif; /* swap for brand face */
+  --font-body:'Segoe UI', 'Helvetica Neue', Arial, system-ui, sans-serif;
+  --mono:'Cascadia Mono', 'JetBrains Mono', ui-monospace, Consolas, monospace;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{height:100%; overflow:hidden; background:#0b0e17; font-family:var(--font-body); color:var(--ink);}
+
+/* ---- viewport + scaled 1280x720 canvas ---- */
+#stage{position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:#0b0e17;}
+#canvas{width:1280px; height:720px; position:relative; flex:none; transform-origin:center center;
+  background:var(--bg); overflow:hidden;}
+
+/* ---- slides ---- */
+.slide{position:absolute; inset:0; z-index:1; padding:0;
+  opacity:0; visibility:hidden; transform:translateY(14px);
+  transition:opacity .45s ease, transform .45s cubic-bezier(.2,.8,.2,1), visibility 0s linear .45s;}
+.slide.active{opacity:1; visibility:visible; transform:none;
+  transition:opacity .5s ease, transform .5s cubic-bezier(.2,.8,.2,1);}
+
+/* ---- reveal: .r = macro zones (auto-staggered), .rr = inner atoms
+   (per-element inline transition-delay). Both gated on .active. ---- */
+.slide .r{opacity:0; transform:translateY(12px); transition:opacity .5s ease, transform .5s cubic-bezier(.2,.8,.2,1);}
+.slide.active .r{opacity:1; transform:none;}
+.slide.active .r:nth-child(1){transition-delay:.05s}.slide.active .r:nth-child(2){transition-delay:.12s}
+.slide.active .r:nth-child(3){transition-delay:.19s}.slide.active .r:nth-child(4){transition-delay:.26s}
+.slide.active .r:nth-child(5){transition-delay:.33s}.slide.active .r:nth-child(6){transition-delay:.40s}
+.slide.active .r:nth-child(7){transition-delay:.47s}.slide.active .r:nth-child(8){transition-delay:.54s}
+.rr{opacity:0; transform:translateY(9px); transition:opacity .45s ease, transform .45s ease;}
+.slide.active .rr{opacity:1; transform:none;}   /* set delay inline: style="transition-delay:.35s" */
+
+/* ---- header band (body slides) ---- */
+.band{position:absolute; left:0; top:0; right:0; height:88px; z-index:2;
+  background:linear-gradient(92deg, var(--navy) 0%, var(--navy2) 78%, #3350c9 100%);
+  display:flex; flex-direction:column; justify-content:center; padding:0 44px; color:#fff;}
+.band::after{content:""; position:absolute; right:150px; top:-30px; width:220px; height:150px;
+  border:1.5px solid rgba(255,255,255,.10); border-radius:24px; transform:rotate(24deg); pointer-events:none;}
+.band .bk{font-size:14px; letter-spacing:.22em; text-transform:uppercase; color:#b9c6f2; font-weight:600;}
+.band .bt{font-size:27px; font-weight:800; letter-spacing:-.01em; line-height:1.15; font-family:var(--font-head);}
+.blogo{position:absolute; right:44px; top:50%; transform:translateY(-50%);
+  font-size:19px; font-weight:800; letter-spacing:.06em; color:#fff;
+  border:2px solid rgba(255,255,255,.75); border-radius:8px; padding:5px 12px;}
+.blogo i{font-style:normal; font-weight:400; color:#b9c6f2;}
+/* ^ placeholder wordmark — replace with the brand logo <img> (data URI) at the same spot */
+
+.frameline{position:absolute; left:0; right:0; top:96px; text-align:center; z-index:2;
+  font-size:16px; font-weight:700; color:var(--blue);}
+.pbody{position:absolute; left:24px; right:24px; top:128px; bottom:92px; z-index:2;}
+.pbody2{position:absolute; left:72px; right:72px; top:150px; bottom:56px; z-index:2;
+  display:flex; flex-direction:column; justify-content:center;}
+
+/* ---- typography ---- */
+h1{font-family:var(--font-head); font-weight:800; letter-spacing:-.015em;}
+.lede{color:var(--ink2); font-size:20px; line-height:1.7; max-width:860px;}
+.meta{color:var(--ink3); font-size:14px;} .meta b{color:var(--accent);}
+code{background:var(--bg2); border:1px solid var(--line); border-radius:5px; padding:1px 7px; font-size:.92em; font-family:var(--mono); color:var(--blue);}
+
+/* ---- poster grid + panels ---- */
+.pgrid{display:grid; height:100%; gap:0; align-items:stretch;}
+.panel{--tone:var(--blue); position:relative; border-radius:12px; padding:14px;
+  border:1.5px solid color-mix(in srgb, var(--tone) 38%, #fff);
+  background:color-mix(in srgb, var(--tone) 6%, #fff);
+  display:flex; flex-direction:column; gap:10px;}
+.panel.t-red{--tone:var(--red);} .panel.t-green{--tone:var(--green);}
+.panel.t-blue{--tone:var(--blue);} .panel.t-orange{--tone:var(--amber);}
+.panel.t-plain{--tone:var(--ink3); background:#fff; border-color:var(--line2);}
+.phead{display:flex; align-items:center; gap:10px; min-height:40px;}
+.nbadge{flex:none; width:34px; height:34px; border-radius:50%; background:var(--tone); color:#fff;
+  font-size:18px; font-weight:800; display:flex; align-items:center; justify-content:center;}
+.phead b{display:block; font-size:18px; font-weight:800; line-height:1.15;
+  color:color-mix(in srgb, var(--tone) 82%, #000); font-family:var(--font-head);}
+.phead i{display:block; font-style:normal; font-size:14px; color:var(--ink3); line-height:1.25;}
+.gaparrow{align-self:center; justify-self:center; color:#9aa5bb; display:flex; align-items:center; justify-content:center;}
+.gaparrow svg{width:22px; height:22px; fill:currentColor;}
+
+/* ---- icon plumbing: strokes inherit through <use> ---- */
+.ic svg,.ock svg,.chip svg,.vstep svg,.titem svg,.mini svg{fill:none; stroke:currentColor;
+  stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round;}
+
+/* ---- icon card (atomic unit) ---- */
+.icard{display:flex; gap:10px; align-items:flex-start; background:#fff; border:1px solid var(--line);
+  border-radius:10px; padding:10px 12px; box-shadow:0 1px 2px rgba(20,31,82,.06);}
+.icard .ic{flex:none; width:34px; height:34px; border-radius:9px; display:flex; align-items:center; justify-content:center;
+  background:color-mix(in srgb, var(--tone) 12%, #fff); color:var(--tone);}
+.icard .ic svg{width:20px; height:20px;}
+.icard b{display:block; font-size:15px; line-height:1.25; color:var(--ink);}
+.icard span{display:block; font-size:14px; line-height:1.3; color:var(--ink3); margin-top:2px;}
+.icard.mini{padding:9px 11px;} .icard.mini b{font-size:14px;}
+
+/* ---- outcome chip (check + claim) ---- */
+.ocard{display:flex; gap:9px; align-items:center; background:#fff; border:1px solid var(--line);
+  border-radius:10px; padding:9px 11px; box-shadow:0 1px 2px rgba(20,31,82,.06);}
+.ocard .ock{flex:none; width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  background:color-mix(in srgb, var(--green) 14%, #fff); color:var(--green);}
+.ocard .ock svg{width:17px; height:17px;}
+.ocard b{display:block; font-size:15px; line-height:1.2;} .ocard span{display:block; font-size:14px; color:var(--ink3); line-height:1.25;}
+.ocard.solid{background:var(--green); border-color:var(--green);}
+.ocard.solid .ock{background:rgba(255,255,255,.2); color:#fff;}
+.ocard.solid b{color:#fff;} .ocard.solid span{color:#d9f2e3;}
+
+/* ---- chip + chip flow ---- */
+.chip{display:inline-flex; align-items:center; gap:6px; background:#fff; border:1px solid color-mix(in srgb, var(--tone) 40%, #fff);
+  color:var(--ink2); border-radius:8px; padding:5px 9px; font-size:14px; font-weight:600; line-height:1.2;}
+.chip svg{width:15px; height:15px; color:var(--tone); flex:none;}
+.chipflow{display:flex; align-items:center; justify-content:center; gap:5px; flex-wrap:nowrap;}
+.carrow{color:#9aa5bb; font-size:15px; font-weight:800;}
+.flowlab{font-size:14px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+  color:color-mix(in srgb, var(--tone) 80%, #000); text-align:center;}
+
+/* ---- vertical mini-chain ---- */
+.vchain{display:flex; flex-direction:column; align-items:stretch; gap:3px;}
+.vstep{display:flex; align-items:center; gap:8px; font-size:14px; color:var(--ink2); line-height:1.25;}
+.vstep svg{width:15px; height:15px; color:var(--tone); flex:none;}
+.varrow{width:15px; display:flex; justify-content:center; color:color-mix(in srgb, var(--tone) 55%, #fff);
+  font-size:12px; line-height:1; margin-left:0;}
+.subpanel{border:1px solid color-mix(in srgb, var(--tone) 35%, #fff); border-radius:9px; background:#fff; padding:10px 12px;}
+.subpanel>b{display:block; font-size:14px; font-weight:700; color:color-mix(in srgb, var(--tone) 80%, #000); margin-bottom:6px;}
+
+/* ---- bottom takeaway / progression band ---- */
+.tband{position:absolute; left:24px; right:24px; bottom:18px; height:62px; z-index:2;
+  display:flex; align-items:center; gap:16px; padding:0 26px;
+  background:var(--bg2); border:1px solid var(--line); border-radius:11px;}
+.tcell{flex:1; text-align:center;}
+.tcell b{display:block; font-size:16px; font-weight:800; line-height:1.2;}
+.tcell span{display:block; font-size:14px; color:var(--ink3); line-height:1.2; margin-top:1px;}
+.tcell.c-red b{color:var(--red);} .tcell.c-blue b{color:var(--blue);} .tcell.c-green b{color:var(--green);}
+.tband .gaparrow svg{width:20px; height:20px;}
+.titem{flex:1; display:flex; align-items:center; justify-content:center; gap:9px; font-size:14px; font-weight:600; color:var(--ink2);}
+.titem svg{width:19px; height:19px; color:var(--navy2); flex:none;}
+.tsep{width:1px; height:32px; background:var(--line2); flex:none;}
+.tk{flex:none; display:flex; align-items:center; gap:10px; font-size:14px; font-weight:800; letter-spacing:.1em; color:var(--blue);}
+.tk .ic{width:32px; height:32px; border-radius:50%; background:var(--blue); color:#fff; display:flex; align-items:center; justify-content:center;}
+.tk .ic svg{width:18px; height:18px;}
+.tband .tsay{flex:1; font-size:15px; color:var(--ink2); line-height:1.35;}
+
+/* ---- pinned scatter zone + SVG underlay (chaos / converge patterns) ---- */
+.szone{position:relative;}
+.szone .pin{position:absolute; z-index:1;}
+.szone svg.underlay{position:absolute; inset:0; width:100%; height:100%; z-index:0; overflow:visible;}
+.underlay .dl{stroke:color-mix(in srgb, var(--red) 55%, #fff); stroke-width:1.6; stroke-dasharray:5 5; fill:none;}
+.underlay text{font-size:14px; font-weight:800; fill:var(--red);}
+.pill{align-self:center; background:var(--tone); color:#fff; font-size:14px; font-weight:700;
+  letter-spacing:.06em; border-radius:999px; padding:5px 16px; display:inline-flex; align-items:center; gap:7px;}
+.pill svg{width:15px; height:15px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round;}
+
+/* ---- embedded clusters (hub / mesh) — screenshot-verified, not checker-modelled ---- */
+svg.orbit{width:100%; height:auto; overflow:visible; display:block;}
+.orbit .oring{fill:none; stroke:#a9b8e0; stroke-width:1.4; stroke-dasharray:3 6;}
+.orbit .ospoke{stroke:#9db1dd; stroke-width:1.4; stroke-dasharray:2 4; fill:none;}
+.orbit .olink{stroke:#c7d1e6; stroke-width:1.2; fill:none;}
+.orbit .odot{fill:#b9c4dd;}
+.orbit .odt{opacity:.7;}   /* accent dots ON the orbit ring, satellite tones */
+.orbit .onode{opacity:0; transform-box:fill-box; transform-origin:center;}
+.slide.active .orbit .onode{animation:pop .5s cubic-bezier(.2,.8,.2,1) forwards;}
+.orbit .oline{stroke-dasharray:1; stroke-dashoffset:1;}
+.slide.active .orbit .oline{animation:draw .6s ease forwards;}
+.orbit .ochip rect{fill:#fff; stroke:var(--line2); stroke-width:1.2; rx:8;}
+.orbit .ochip text{font-family:var(--font-body); font-size:14px; font-weight:600; fill:var(--ink2); text-anchor:middle;}
+.orbit .ohub circle{fill:var(--tone);}
+.orbit .ohub text{font-family:var(--font-head); font-size:14px; font-weight:700; fill:color-mix(in srgb, var(--tone) 85%, #000); text-anchor:middle;}
+.orbit use{fill:none; stroke:#fff; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round;}
+@keyframes pop{from{opacity:0; transform:scale(.6);}to{opacity:1; transform:scale(1);}}
+@keyframes draw{to{stroke-dashoffset:0;}}
+
+/* ---- classic checker-friendly graph (kept from the base template) ---- */
+.gwrap{display:flex; justify-content:center;}
+svg.graph{width:100%; max-width:1140px; height:auto; overflow:visible;}
+.ge{stroke:var(--blue); stroke-width:2.2; fill:none; opacity:.9; stroke-dasharray:1; stroke-dashoffset:1;}
+.slide.active .ge{animation:draw .7s ease forwards;}
+.gn{opacity:0; transform-box:fill-box; transform-origin:center;}
+.slide.active .gn{animation:pop .55s cubic-bezier(.2,.8,.2,1) forwards;}
+.gn text{font-family:var(--font-body); fill:var(--ink); font-weight:700; text-anchor:middle;}
+.gn .t{font-size:16px;} .gn .s{font-size:14px; fill:var(--ink3); font-weight:400;}
+.gn.a rect{fill:color-mix(in srgb,var(--blue) 9%,#fff); stroke:var(--blue);}
+.gn.b rect{fill:color-mix(in srgb,var(--amber) 10%,#fff); stroke:var(--amber);}
+.gn.c rect{fill:color-mix(in srgb,var(--green) 9%,#fff); stroke:var(--green);}
+.gn.d rect{fill:color-mix(in srgb,var(--red) 9%,#fff); stroke:var(--red);}
+
+/* ---- cover / end (full-bleed navy) ---- */
+.slide[data-role="cover"],.slide[data-role="end"]{background:
+  radial-gradient(ellipse 60% 55% at 85% 8%, rgba(70,110,255,.28), transparent 60%),
+  radial-gradient(ellipse 55% 60% at 8% 100%, rgba(29,138,75,.16), transparent 60%),
+  linear-gradient(120deg, #101a45 0%, var(--navy) 45%, #1d2d7c 100%); color:#fff;
+  display:flex; flex-direction:column; justify-content:center; padding:0 96px;}
+.slide[data-role="cover"]::before,.slide[data-role="end"]::before{content:""; position:absolute; right:-140px; top:-180px;
+  width:520px; height:520px; border:1.5px solid rgba(255,255,255,.10); border-radius:50%;}
+.slide[data-role="cover"]::after,.slide[data-role="end"]::after{content:""; position:absolute; right:-60px; top:-100px;
+  width:520px; height:520px; border:1.5px solid rgba(255,255,255,.07); border-radius:50%;}
+.ceyebrow{font-size:14px; letter-spacing:.3em; text-transform:uppercase; color:#8fa3e8; font-weight:600; margin-bottom:16px;}
+.slide[data-role="cover"] h1{font-size:62px; line-height:1.06; max-width:980px;}
+.slide[data-role="cover"] h1 b{color:#7da2ff;}
+.csub{font-size:22px; color:#c4cdf1; margin-top:18px; max-width:900px; line-height:1.5;}
+.cmeta{font-size:14px; color:#8b97c9; margin-top:44px; display:flex; gap:26px;}
+.crule{width:76px; height:4px; border-radius:2px; background:linear-gradient(90deg,#7da2ff,#4fd08b); margin-bottom:26px;}
+.slide[data-role="cover"] .blogo,.slide[data-role="end"] .blogo{top:56px; transform:none;}
+
+/* ---- agenda rows ---- */
+.agrow{display:flex; align-items:center; gap:22px; padding:20px 8px; border-bottom:1px solid var(--line);}
+.agrow:last-child{border-bottom:0;}
+.agrow .no{flex:none; font-size:30px; font-weight:800; color:var(--blue); font-family:var(--font-head); width:56px;}
+.agrow b{display:block; font-size:21px; font-weight:800; color:var(--ink);}
+.agrow span{display:block; font-size:15px; color:var(--ink3); margin-top:2px;}
+.agrow .ic{flex:none; margin-left:auto; width:40px; height:40px; border-radius:10px; background:var(--bg2);
+  color:var(--navy2); display:flex; align-items:center; justify-content:center;}
+.agrow .ic svg{width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round;}
+
+/* ---- chrome ---- */
+#bar{position:fixed; left:0; bottom:0; height:3px; background:linear-gradient(90deg,var(--blue),var(--green)); z-index:10; transition:width .4s cubic-bezier(.2,.8,.2,1);}
+#counter{position:fixed; right:16px; bottom:14px; z-index:10; font-size:13px; color:var(--ink3); background:rgba(255,255,255,.92); padding:4px 12px; border:1px solid var(--line); border-radius:999px;}
+#counter b{color:var(--blue);}
+#hint{position:fixed; left:16px; bottom:14px; z-index:10; font-size:12px; color:#8b97c9; transition:opacity .6s;} #hint.gone{opacity:0;}
+#dots{position:fixed; left:50%; transform:translateX(-50%); bottom:13px; z-index:10; display:flex; gap:7px;}
+#dots i{width:7px; height:7px; border-radius:50%; background:var(--line2); cursor:pointer; transition:all .25s;}
+#dots i.on{background:var(--blue); transform:scale(1.3);}
+@media(prefers-reduced-motion:reduce){
+  .slide{transition:none!important;}
+  .slide .r,.rr,.ge,.gn,.onode,.oline{transition:opacity .3s!important; animation:none!important; opacity:1!important; stroke-dashoffset:0!important; transform:none!important;}
+}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="canvas">
+
+  <!-- ======== ICON LIBRARY — one stroke set, instantiate with <use href="#i-…"> ======== -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+    <symbol id="i-doc" viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/><path d="M10 12h5M10 15.5h5"/></symbol>
+    <symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="5.5" rx="7" ry="2.7"/><path d="M5 5.5v13c0 1.5 3.1 2.7 7 2.7s7-1.2 7-2.7v-13"/><path d="M5 12c0 1.5 3.1 2.7 7 2.7s7-1.2 7-2.7"/></symbol>
+    <symbol id="i-code" viewBox="0 0 24 24"><path d="M9 8l-4 4 4 4"/><path d="M15 8l4 4-4 4"/></symbol>
+    <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 4.5v2.2M12 17.3v2.2M4.5 12h2.2M17.3 12h2.2M6.7 6.7l1.6 1.6M15.7 15.7l1.6 1.6M17.3 6.7l-1.6 1.6M8.3 15.7l-1.6 1.6"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="5.6"/><path d="M15 15l5 5"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5.5 20c.5-3.7 3.2-5.6 6.5-5.6s6 1.9 6.5 5.6"/></symbol>
+    <symbol id="i-team" viewBox="0 0 24 24"><circle cx="9" cy="9" r="2.8"/><path d="M3.5 19c.4-3 2.6-4.6 5.5-4.6s5.1 1.6 5.5 4.6"/><circle cx="16.5" cy="8" r="2.4"/><path d="M16.8 13.6c2.3.3 3.9 1.8 4.2 4.4"/></symbol>
+    <symbol id="i-bug" viewBox="0 0 24 24"><circle cx="12" cy="6.6" r="2"/><ellipse cx="12" cy="14.5" rx="4.5" ry="5"/><path d="M12 9.5v10M4.5 12.5h3M16.5 12.5h3M5.5 18l2.3-1.4M18.5 18l-2.3-1.4M5.5 8l2.4 1.6M18.5 8l-2.4 1.6"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 2.8v5.4c0 4.6-3 7.7-7 9.8-4-2.1-7-5.2-7-9.8V5.8z"/><path d="M9 11.8l2.2 2.2 3.8-4.4"/></symbol>
+    <symbol id="i-clip" viewBox="0 0 24 24"><rect x="5.5" y="4" width="13" height="17" rx="2"/><rect x="9" y="2.5" width="6" height="3.5" rx="1"/><path d="M9 13l2 2 4-4.5"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.5"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-net" viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.3"/><circle cx="18" cy="6" r="2.3"/><circle cx="12" cy="18" r="2.3"/><path d="M7.4 7.9l3.4 7.6M16.6 7.9l-3.4 7.6M8.3 6h7.4"/></symbol>
+    <symbol id="i-chip" viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M9 3v4M15 3v4M9 17v4M15 17v4M3 9h4M3 15h4M17 9h4M17 15h4"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 4v16h16"/><path d="M8 15l3.5-4 3 2.5L19 8"/><path d="M15.5 8H19v3.5"/></symbol>
+    <symbol id="i-cycle" viewBox="0 0 24 24"><path d="M5.5 9a7 7 0 0112.4-1.6"/><path d="M18.3 3.6v4h-4"/><path d="M18.5 15a7 7 0 01-12.4 1.6"/><path d="M5.7 20.4v-4h4"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.2"/><path d="M8.2 12.4l2.6 2.6 5-5.6"/></symbol>
+    <symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 4l9 15.5H3z"/><path d="M12 10.2v4.4"/><circle cx="12" cy="17" r=".4" fill="currentColor"/></symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 3.5l8.5 4.5L12 12.5 3.5 8z"/><path d="M3.5 12.5L12 17l8.5-4.5"/><path d="M3.5 16.5L12 21l8.5-4.5"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="M14.5 5.5l4 4L8 20H4v-4z"/><path d="M12.5 7.5l4 4"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5.5c2-1.2 4.5-1.2 8 0 3.5-1.2 6-1.2 8 0v13c-2-1.2-4.5-1.2-8 0-3.5-1.2-6-1.2-8 0z"/><path d="M12 5.5v13"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="6" y="10.5" width="12" height="9.5" rx="2"/><path d="M8.5 10.5V8a3.5 3.5 0 017 0v2.5"/></symbol>
+    <symbol id="i-gauge" viewBox="0 0 24 24"><path d="M4 16a8.2 8.2 0 0116 0"/><path d="M12 16l3.6-4.4"/><circle cx="12" cy="16" r="1.1" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 4l2.3 4.9 5.2.7-3.8 3.8.9 5.2-4.6-2.5-4.6 2.5.9-5.2L4.5 9.6l5.2-.7z"/></symbol>
+    <symbol id="i-fat-arrow" viewBox="0 0 24 24"><path d="M4 9h9V5.5L21 12l-8 6.5V15H4z" stroke="none"/></symbol>
+    <!-- tone-to-tone transition gradients (progression-band arrows) + two-way chaos marker -->
+    <linearGradient id="gr-rb" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#c22f3d"/><stop offset="1" stop-color="#2456c4"/></linearGradient>
+    <linearGradient id="gr-bg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2456c4"/><stop offset="1" stop-color="#1d8a4b"/></linearGradient>
+    <marker id="mred" markerWidth="7" markerHeight="7" refX="5.5" refY="2.6" orient="auto-start-reverse"><path d="M0,0 L5.5,2.6 L0,5.2 Z" fill="#c22f3d"/></marker>
+  </defs></svg>
+
+    <!-- ============ SLIDE 1 · COVER ============ -->
+    <section class="slide" data-role="cover">
+      <span class="blogo">ACME<i>corp</i></span>
+      <div class="r ceyebrow">Internal workshop · Q1 review</div>
+      <div class="r crule"></div>
+      <h1 class="r">Deck title stating the <b>one main claim</b></h1>
+      <p class="r csub">A formal subtitle that frames the topic and the audience in a single line.</p>
+      <div class="r cmeta"><span>Presenter · Role</span><span>Date</span><span>Confidentiality note</span></div>
+    </section>
+
+    <!-- ============ SLIDE 2 · AGENDA ============ -->
+    <section class="slide" data-role="slide">
+      <header class="band r"><div class="bk">Agenda</div><div class="bt">What this session covers</div><span class="blogo">ACME<i>corp</i></span></header>
+      <div class="pbody2">
+        <div class="r agrow"><span class="no">01</span><div><b>The challenge</b><span>Why the current approach stalls at project scale</span></div><span class="ic"><svg><use href="#i-warn"/></svg></span></div>
+        <div class="r agrow"><span class="no">02</span><div><b>Why a shared knowledge base matters</b><span>From scattered data to shared deep context</span></div><span class="ic"><svg><use href="#i-book"/></svg></span></div>
+        <div class="r agrow"><span class="no">03</span><div><b>Platform architecture</b><span>Sources, ingestion, knowledge core, and delivery</span></div><span class="ic"><svg><use href="#i-layers"/></svg></span></div>
+      </div>
+    </section>
+
+    <!-- ============ SLIDE 3 · POSTER — staged argument (challenge → core → skills → outcomes)
+         Pattern: numbered stage panels + icon cards + hub cluster + chip flow + rail + progression band ============ -->
+    <section class="slide" data-role="slide">
+      <header class="band r"><div class="bk">01&nbsp;&nbsp;|&nbsp;&nbsp;The challenge</div><div class="bt">Delivery needs faster context discovery and consistent evidence</div><span class="blogo">ACME<i>corp</i></span></header>
+      <div class="frameline r">The platform adds a scalable, project-specific context layer — an enhancement, not a replacement.</div>
+      <div class="pbody r">
+        <div class="pgrid" style="grid-template-columns:284px 22px 352px 22px 284px 22px 1fr;">
+          <div class="panel t-red">
+            <div class="phead"><span class="nbadge">1</span><div><b>Current Challenge</b><i>steering alone stalls at scale</i></div></div>
+            <div class="icard rr" style="transition-delay:.25s"><span class="ic"><svg><use href="#i-doc"/></svg></span><div><b>Fragmented context</b><span>code, docs, tickets and tests live apart</span></div></div>
+            <div class="icard rr" style="transition-delay:.33s"><span class="ic"><svg><use href="#i-db"/></svg></span><div><b>Large legacy scale</b><span>millions of lines across many subsystems</span></div></div>
+            <div class="icard rr" style="transition-delay:.41s"><span class="ic"><svg><use href="#i-search"/></svg></span><div><b>Manual investigation</b><span>slow context search and validation</span></div></div>
+            <div class="icard rr" style="transition-delay:.49s"><span class="ic"><svg><use href="#i-user"/></svg></span><div><b>Person-dependent output</b><span>quality varies by prompt and person</span></div></div>
+          </div>
+          <div class="gaparrow rr" style="transition-delay:.5s"><svg><use href="#i-fat-arrow"/></svg></div>
+          <div class="panel t-blue">
+            <div class="phead"><span class="nbadge">2</span><div><b>Shared Knowledge Core</b><i>fragmented data becomes deep context</i></div></div>
+            <svg class="orbit" viewBox="0 0 324 296" style="margin:auto 0" role="img" aria-label="Source map connecting docs, specs, code, tests and history">
+              <ellipse class="oring" cx="162" cy="142" rx="112" ry="93"/>
+              <line class="ospoke" x1="162" y1="142" x2="162" y2="49"/>
+              <line class="ospoke" x1="162" y1="142" x2="268" y2="113"/>
+              <line class="ospoke" x1="162" y1="142" x2="228" y2="217"/>
+              <line class="ospoke" x1="162" y1="142" x2="96" y2="217"/>
+              <line class="ospoke" x1="162" y1="142" x2="56" y2="113"/>
+              <circle class="odt" cx="228" cy="67" r="2.5" fill="var(--green)"/>
+              <circle class="odt" cx="268" cy="171" r="2.5" fill="var(--amber)"/>
+              <circle class="odt" cx="162" cy="235" r="2.5" fill="var(--violet)"/>
+              <circle class="odt" cx="56" cy="171" r="2.5" fill="var(--red)"/>
+              <circle class="odt" cx="96" cy="67" r="2.5" fill="var(--blue)"/>
+              <g class="onode ohub" style="animation-delay:.35s">
+                <circle cx="162" cy="142" r="27"/>
+                <use href="#i-db" x="150" y="130" width="24" height="24"/>
+                <text x="162" y="187">Source map</text>
+              </g>
+              <g class="onode ochip" style="animation-delay:.55s"><rect x="130" y="36" width="64" height="26"/><text x="162" y="53">Docs</text></g>
+              <g class="onode ochip" style="animation-delay:.65s"><rect x="236" y="100" width="64" height="26"/><text x="268" y="117">Code</text></g>
+              <g class="onode ochip" style="animation-delay:.75s"><rect x="196" y="204" width="64" height="26"/><text x="228" y="221">Tests</text></g>
+              <g class="onode ochip" style="animation-delay:.85s"><rect x="60" y="204" width="72" height="26"/><text x="96" y="221">History</text></g>
+              <g class="onode ochip" style="animation-delay:.95s"><rect x="24" y="100" width="64" height="26"/><text x="56" y="117">Specs</text></g>
+            </svg>
+            <div style="margin-top:auto">
+              <div class="flowlab rr" style="transition-delay:.9s">Impact evidence chain</div>
+              <div class="chipflow rr" style="transition-delay:1s; margin-top:5px">
+                <span class="chip">Change</span><span class="carrow">→</span>
+                <span class="chip">Impacted</span><span class="carrow">→</span>
+                <span class="chip">Evidence</span><span class="carrow">→</span>
+                <span class="chip">Decision</span>
+              </div>
+            </div>
+          </div>
+          <div class="gaparrow rr" style="transition-delay:.7s"><svg><use href="#i-fat-arrow"/></svg></div>
+          <div class="panel t-green">
+            <div class="phead"><span class="nbadge">3</span><div><b>Delivery Skills</b><i>project-specific skills on deep context</i></div></div>
+            <div class="icard rr" style="transition-delay:.45s"><span class="ic"><svg><use href="#i-bug"/></svg></span><div><b>Standardised analysis</b><span>root cause and pattern detection</span></div></div>
+            <div class="icard rr" style="transition-delay:.53s"><span class="ic"><svg><use href="#i-net"/></svg></span><div><b>Impact analysis</b><span>code, module, data and regression reach</span></div></div>
+            <div class="icard rr" style="transition-delay:.61s"><span class="ic"><svg><use href="#i-shield"/></svg></span><div><b>Review support</b><span>quality checks and best practice</span></div></div>
+            <div class="icard rr" style="transition-delay:.69s"><span class="ic"><svg><use href="#i-clip"/></svg></span><div><b>Test selection</b><span>relevant scope and regression coverage</span></div></div>
+          </div>
+          <div class="gaparrow rr" style="transition-delay:.9s"><svg><use href="#i-fat-arrow"/></svg></div>
+          <div style="display:flex; flex-direction:column; gap:9px; justify-content:center;">
+            <div class="ocard rr" style="transition-delay:.75s"><span class="ock"><svg><use href="#i-gauge"/></svg></span><div><b>Faster resolution</b><span>hours, not days</span></div></div>
+            <div class="ocard rr" style="transition-delay:.83s"><span class="ock"><svg><use href="#i-doc"/></svg></span><div><b>High-quality evidence</b><span>consistent and reviewable</span></div></div>
+            <div class="ocard rr" style="transition-delay:.91s"><span class="ock"><svg><use href="#i-cycle"/></svg></span><div><b>Reduced rework</b><span>fewer clarification cycles</span></div></div>
+            <div class="ocard rr" style="transition-delay:.99s"><span class="ock"><svg><use href="#i-db"/></svg></span><div><b>Knowledge reuse</b><span>maintained, not lost</span></div></div>
+            <div class="ocard solid rr" style="transition-delay:1.07s"><span class="ock"><svg><use href="#i-chart"/></svg></span><div><b>Context-aware delivery</b><span>across the whole lifecycle</span></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="tband r">
+        <div class="tcell c-red"><b>Manual context hunting</b><span>slow, manual, inconsistent</span></div>
+        <div class="gaparrow"><svg viewBox="0 0 24 24"><path d="M4 9h9V5.5L21 12l-8 6.5V15H4z" fill="url(#gr-rb)"/></svg></div>
+        <div class="tcell c-blue"><b>Shared deep context</b><span>connected, traceable, trusted</span></div>
+        <div class="gaparrow"><svg viewBox="0 0 24 24"><path d="M4 9h9V5.5L21 12l-8 6.5V15H4z" fill="url(#gr-bg)"/></svg></div>
+        <div class="tcell c-green"><b>Consistent, reviewable delivery</b><span>faster resolution, higher quality</span></div>
+      </div>
+    </section>
+
+    <!-- ============ SLIDE 4 · POSTER — before/after contrast (without vs with)
+         Pattern: red chaos panel (pinned cards + dashed underlay) · centre steps · green order panel · takeaway ============ -->
+    <section class="slide" data-role="slide">
+      <header class="band r"><div class="bk">02&nbsp;&nbsp;|&nbsp;&nbsp;Why it matters</div><div class="bt">Why a shared knowledge base matters</div><span class="blogo">ACME<i>corp</i></span></header>
+      <div class="frameline r">Project-specific knowledge turns generic assistance into contextual delivery acceleration.</div>
+      <div class="pbody r">
+        <div class="pgrid" style="grid-template-columns:400px 16px 218px 16px 1fr;">
+          <div class="panel t-red">
+            <span class="pill"><svg><use href="#i-warn"/></svg>Without knowledge base</span>
+            <div style="flex:1; display:flex; flex-direction:column; justify-content:center">
+            <div class="szone" style="height:216px">
+              <svg class="underlay" viewBox="0 0 372 216" preserveAspectRatio="none" aria-hidden="true">
+                <!-- dashed two-way links (chaos): arrowheads land in visible gaps between cards -->
+                <line class="dl" x1="168" y1="34" x2="204" y2="34" marker-start="url(#mred)" marker-end="url(#mred)"/>
+                <line class="dl" x1="168" y1="150" x2="204" y2="150" marker-start="url(#mred)" marker-end="url(#mred)"/>
+                <line class="dl" x1="140" y1="58" x2="232" y2="126" marker-start="url(#mred)" marker-end="url(#mred)"/>
+                <line class="dl" x1="232" y1="58" x2="140" y2="126" marker-start="url(#mred)" marker-end="url(#mred)"/>
+                <line class="dl" x1="52" y1="58" x2="52" y2="126" marker-start="url(#mred)" marker-end="url(#mred)"/>
+                <line class="dl" x1="320" y1="58" x2="320" y2="126" marker-start="url(#mred)" marker-end="url(#mred)"/>
+                <text x="186" y="30" text-anchor="middle">?</text><text x="60" y="96">?</text><text x="304" y="96">?</text><text x="186" y="146" text-anchor="middle">?</text>
+              </svg>
+              <div class="icard mini pin rr" style="left:2px; top:12px; width:160px; transition-delay:.3s"><span class="ic"><svg><use href="#i-doc"/></svg></span><div><b>Docs / specs</b></div></div>
+              <div class="icard mini pin rr" style="right:2px; top:12px; width:160px; transition-delay:.38s"><span class="ic"><svg><use href="#i-warn"/></svg></span><div><b>Tickets / issues</b></div></div>
+              <div class="icard mini pin rr" style="left:2px; top:128px; width:160px; transition-delay:.46s"><span class="ic"><svg><use href="#i-code"/></svg></span><div><b>Source code</b></div></div>
+              <div class="icard mini pin rr" style="right:2px; top:128px; width:160px; transition-delay:.54s"><span class="ic"><svg><use href="#i-team"/></svg></span><div><b>Chats / Q&amp;A</b></div></div>
+              <div class="icard mini pin rr" style="left:106px; top:70px; width:160px; transition-delay:.62s"><span class="ic"><svg><use href="#i-user"/></svg></span><div><b>Individual know-how</b></div></div>
+            </div>
+            </div>
+            <div class="flowlab rr" style="transition-delay:.7s">Result — generic assistance</div>
+            <div class="rr" style="display:grid; grid-template-columns:1fr 1fr; gap:7px; transition-delay:.78s">
+              <span class="chip"><svg><use href="#i-warn"/></svg>Prompt dependency</span>
+              <span class="chip"><svg><use href="#i-warn"/></svg>Longer onboarding</span>
+              <span class="chip"><svg><use href="#i-warn"/></svg>Repeated clarification</span>
+              <span class="chip"><svg><use href="#i-warn"/></svg>Inconsistent output</span>
+            </div>
+          </div>
+          <div class="gaparrow rr" style="transition-delay:.6s"><svg><use href="#i-fat-arrow"/></svg></div>
+          <div class="panel t-blue" style="background:#fff;">
+            <div class="phead" style="justify-content:center"><div style="text-align:center"><b>Context understanding</b><i>how the assistant learns</i></div></div>
+            <div style="flex:1; display:flex; flex-direction:column; gap:10px; justify-content:center">
+            <div class="icard rr" style="transition-delay:.4s"><span class="ic"><svg><use href="#i-search"/></svg></span><div><b>1 · Understand</b><span>ingest fragmented information</span></div></div>
+            <div class="varrow rr" style="align-self:center; color:var(--blue); transition-delay:.5s">▼</div>
+            <div class="icard rr" style="transition-delay:.55s"><span class="ic"><svg><use href="#i-net"/></svg></span><div><b>2 · Connect</b><span>link people, code, docs, history</span></div></div>
+            <div class="varrow rr" style="align-self:center; color:var(--blue); transition-delay:.65s">▼</div>
+            <div class="icard rr" style="transition-delay:.7s"><span class="ic"><svg><use href="#i-target"/></svg></span><div><b>3 · Contextualise</b><span>build project-specific context</span></div></div>
+            </div>
+          </div>
+          <div class="gaparrow rr" style="transition-delay:.8s"><svg><use href="#i-fat-arrow"/></svg></div>
+          <div class="panel t-green">
+            <span class="pill"><svg><use href="#i-check"/></svg>With knowledge base</span>
+            <div style="display:flex; flex-direction:column; gap:10px; flex:1; justify-content:center">
+            <div class="rr" style="display:grid; grid-template-columns:repeat(4,1fr); gap:7px; transition-delay:.45s">
+              <span class="chip"><svg><use href="#i-net"/></svg>Code graph</span>
+              <span class="chip"><svg><use href="#i-doc"/></svg>Docs &amp; specs</span>
+              <span class="chip"><svg><use href="#i-bug"/></svg>Defects &amp; fixes</span>
+              <span class="chip"><svg><use href="#i-book"/></svg>Standards</span>
+            </div>
+            <div class="rr" style="display:grid; grid-template-columns:repeat(4,1fr); transition-delay:.55s">
+              <span class="varrow" style="justify-self:center; color:var(--green)">▼</span><span class="varrow" style="justify-self:center; color:var(--green)">▼</span><span class="varrow" style="justify-self:center; color:var(--green)">▼</span><span class="varrow" style="justify-self:center; color:var(--green)">▼</span>
+            </div>
+            <div class="rr" style="border:2px solid var(--green); border-radius:10px; background:#fff; padding:9px 14px; display:flex; align-items:center; gap:11px; transition-delay:.65s">
+              <span class="ic" style="width:34px;height:34px;border-radius:9px;background:color-mix(in srgb,var(--green) 13%,#fff);color:var(--green);display:flex;align-items:center;justify-content:center"><svg style="width:20px;height:20px"><use href="#i-db"/></svg></span>
+              <div><b style="font-size:16px">Unified knowledge base</b><span style="display:block;font-size:14px;color:var(--ink3)">unified · linked · reusable · update-aware</span></div>
+            </div>
+            <div class="rr" style="display:grid; grid-template-columns:repeat(4,1fr); transition-delay:.75s">
+              <span class="varrow" style="justify-self:center; color:var(--green)">▼</span><span class="varrow" style="justify-self:center; color:var(--green)">▼</span><span class="varrow" style="justify-self:center; color:var(--green)">▼</span><span class="varrow" style="justify-self:center; color:var(--green)">▼</span>
+            </div>
+            <div class="rr" style="display:grid; grid-template-columns:repeat(4,1fr); gap:7px; transition-delay:.85s">
+              <span class="chip"><svg><use href="#i-chip"/></svg>AI assistant</span>
+              <span class="chip"><svg><use href="#i-code"/></svg>Developers</span>
+              <span class="chip"><svg><use href="#i-shield"/></svg>Reviewers</span>
+              <span class="chip"><svg><use href="#i-team"/></svg>Project team</span>
+            </div>
+            </div>
+            <div class="rr" style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:auto; transition-delay:.95s">
+              <div class="ocard"><span class="ock"><svg><use href="#i-check"/></svg></span><div><b>Faster onboarding</b></div></div>
+              <div class="ocard"><span class="ock"><svg><use href="#i-check"/></svg></span><div><b>Consistent review</b></div></div>
+              <div class="ocard"><span class="ock"><svg><use href="#i-check"/></svg></span><div><b>Less rework</b></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tband r">
+        <span class="tk"><span class="ic"><svg><use href="#i-star"/></svg></span>Key takeaway</span>
+        <span class="tsep"></span>
+        <span class="tsay">The knowledge base is what lets assistance scale from individual productivity to team-level delivery capability.</span>
+      </div>
+    </section>
+
+    <!-- ============ SLIDE 5 · POSTER — architecture pipeline (numbered columns, sub-chains, mesh core)
+         Pattern: stage columns + vertical mini-chains + mesh cluster + agent grid + compliance strip ============ -->
+    <section class="slide" data-role="slide">
+      <header class="band r"><div class="bk">03&nbsp;&nbsp;|&nbsp;&nbsp;Architecture</div><div class="bt">Knowledge base architecture</div><span class="blogo">ACME<i>corp</i></span></header>
+      <div class="frameline r">From fragmented data to shared deep context for enterprise delivery.</div>
+      <div class="pbody r">
+        <div class="pgrid" style="grid-template-columns:230px 18px 300px 18px 332px 18px 1fr;">
+          <div class="panel t-plain">
+            <div class="phead"><span class="nbadge" style="background:var(--navy2)">1</span><div><b style="color:var(--ink)">Data sources</b><i>what the platform reads</i></div></div>
+            <div style="display:flex; flex-direction:column; gap:9px; flex:1; justify-content:space-evenly">
+            <div class="icard mini rr" style="--tone:var(--navy2); transition-delay:.25s"><span class="ic"><svg><use href="#i-code"/></svg></span><div><b>Source repositories</b></div></div>
+            <div class="icard mini rr" style="--tone:var(--navy2); transition-delay:.33s"><span class="ic"><svg><use href="#i-doc"/></svg></span><div><b>Project documents</b></div></div>
+            <div class="icard mini rr" style="--tone:var(--navy2); transition-delay:.41s"><span class="ic"><svg><use href="#i-clip"/></svg></span><div><b>Tests &amp; defect history</b></div></div>
+            <div class="icard mini rr" style="--tone:var(--navy2); transition-delay:.49s"><span class="ic"><svg><use href="#i-book"/></svg></span><div><b>Standards &amp; guidelines</b></div></div>
+            </div>
+          </div>
+          <div class="gaparrow rr" style="transition-delay:.45s"><svg><use href="#i-fat-arrow"/></svg></div>
+          <div class="panel t-orange">
+            <div class="phead"><span class="nbadge">2</span><div><b>Ingestion &amp; understanding</b><i>two parallel analyses</i></div></div>
+            <div class="subpanel rr" style="transition-delay:.4s"><b>A · Document understanding</b>
+              <div class="vchain">
+                <div class="vstep"><svg><use href="#i-doc"/></svg>Preprocess &amp; clean</div><span class="varrow">▼</span>
+                <div class="vstep"><svg><use href="#i-layers"/></svg>Semantic chunking</div><span class="varrow">▼</span>
+                <div class="vstep"><svg><use href="#i-search"/></svg>Entity recognition</div><span class="varrow">▼</span>
+                <div class="vstep"><svg><use href="#i-net"/></svg>Embedding &amp; linking</div>
+              </div>
+            </div>
+            <div class="subpanel rr" style="--tone:var(--blue); transition-delay:.55s"><b>B · Code understanding</b>
+              <div class="vchain">
+                <div class="vstep"><svg><use href="#i-code"/></svg>AST / syntax parsing</div><span class="varrow">▼</span>
+                <div class="vstep"><svg><use href="#i-net"/></svg>Call graph extraction</div><span class="varrow">▼</span>
+                <div class="vstep"><svg><use href="#i-layers"/></svg>Dependency mapping</div><span class="varrow">▼</span>
+                <div class="vstep"><svg><use href="#i-db"/></svg>Code embedding</div>
+              </div>
+            </div>
+          </div>
+          <div class="gaparrow rr" style="transition-delay:.65s"><svg><use href="#i-fat-arrow"/></svg></div>
+          <div class="panel t-blue">
+            <div class="phead"><span class="nbadge">3</span><div><b>Unified knowledge core</b><i>living, linked, queryable</i></div></div>
+            <svg class="orbit" viewBox="0 0 304 264" role="img" aria-label="Knowledge graph linking specs, modules, classes and decisions">
+              <line class="olink" x1="66" y1="46" x2="152" y2="128"/>
+              <line class="olink" x1="238" y1="50" x2="152" y2="128"/>
+              <line class="olink" x1="42" y1="128" x2="152" y2="128"/>
+              <line class="olink" x1="262" y1="128" x2="152" y2="128"/>
+              <line class="olink" x1="70" y1="212" x2="152" y2="128"/>
+              <line class="olink" x1="236" y1="210" x2="152" y2="128"/>
+              <line class="olink" x1="66" y1="46" x2="42" y2="128"/>
+              <line class="olink" x1="238" y1="50" x2="262" y2="128"/>
+              <line class="olink" x1="42" y1="128" x2="70" y2="212"/>
+              <line class="olink" x1="262" y1="128" x2="236" y2="210"/>
+              <circle class="odot" cx="110" cy="84" r="2"/><circle class="odot" cx="196" cy="86" r="2"/>
+              <circle class="odot" cx="96" cy="170" r="2"/><circle class="odot" cx="206" cy="168" r="2"/>
+              <circle class="odot" cx="152" cy="62" r="2"/><circle class="odot" cx="152" cy="196" r="2"/>
+              <circle class="odot" cx="66" cy="128" r="2"/><circle class="odot" cx="240" cy="128" r="2"/>
+              <g class="onode ohub" style="animation-delay:.4s">
+                <circle cx="152" cy="128" r="26"/>
+                <use href="#i-net" x="140" y="116" width="24" height="24"/>
+              </g>
+              <g class="onode ochip" style="animation-delay:.55s"><rect x="32" y="33" width="68" height="26"/><text x="66" y="50">Spec</text></g>
+              <g class="onode ochip" style="animation-delay:.63s"><rect x="200" y="37" width="76" height="26"/><text x="238" y="54">Module</text></g>
+              <g class="onode ochip" style="animation-delay:.71s"><rect x="8" y="115" width="68" height="26"/><text x="42" y="132">Class</text></g>
+              <g class="onode ochip" style="animation-delay:.79s"><rect x="228" y="115" width="68" height="26"/><text x="262" y="132">Logic</text></g>
+              <g class="onode ochip" style="animation-delay:.87s"><rect x="26" y="199" width="88" height="26"/><text x="70" y="216">Decision</text></g>
+              <g class="onode ochip" style="animation-delay:.95s"><rect x="194" y="197" width="84" height="26"/><text x="236" y="214">Impact</text></g>
+            </svg>
+            <div class="rr" style="margin-top:auto; text-align:center; font-size:14px; color:var(--ink3); border-top:1px dashed var(--line2); padding-top:7px; transition-delay:1s">Living links — traceable · queryable · update-aware</div>
+          </div>
+          <div class="gaparrow rr" style="transition-delay:.85s"><svg><use href="#i-fat-arrow"/></svg></div>
+          <div class="panel t-green">
+            <div class="phead"><span class="nbadge">4</span><div><b>Context delivery</b><i>agents consume living context</i></div></div>
+            <div class="icard rr" style="transition-delay:.55s"><span class="ic"><svg><use href="#i-shield"/></svg></span><div><b>API gateway</b><span>governed access for agents</span></div></div>
+            <div class="icard rr" style="transition-delay:.63s"><span class="ic"><svg><use href="#i-search"/></svg></span><div><b>Retrieval &amp; ranking</b><span>the right context, scoped</span></div></div>
+            <div class="flowlab rr" style="transition-delay:.71s">Consuming agents</div>
+            <div class="rr" style="display:grid; grid-template-columns:1fr 1fr; gap:7px; transition-delay:.79s">
+              <span class="chip"><svg><use href="#i-chip"/></svg>AI assistant</span>
+              <span class="chip"><svg><use href="#i-code"/></svg>IDE agent</span>
+              <span class="chip"><svg><use href="#i-shield"/></svg>Review bot</span>
+              <span class="chip"><svg><use href="#i-gear"/></svg>CLI agent</span>
+            </div>
+            <div class="ocard solid rr" style="margin-top:auto; transition-delay:.9s"><span class="ock"><svg><use href="#i-target"/></svg></span><div><b>Context-aware execution</b><span>across the whole SDLC</span></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="tband r">
+        <div class="titem"><svg><use href="#i-lock"/></svg>Data privacy by design</div><span class="tsep"></span>
+        <div class="titem"><svg><use href="#i-user"/></svg>Access control &amp; governance</div><span class="tsep"></span>
+        <div class="titem"><svg><use href="#i-clip"/></svg>Audit &amp; traceability</div><span class="tsep"></span>
+        <div class="titem"><svg><use href="#i-layers"/></svg>Enterprise ready</div>
+      </div>
+    </section>
+
+    <!-- ============ SLIDE 6 · END ============ -->
+    <section class="slide" data-role="end">
+      <span class="blogo">ACME<i>corp</i></span>
+      <div class="r ceyebrow">Closing</div>
+      <div class="r crule"></div>
+      <h1 class="r" style="font-size:54px; line-height:1.1; max-width:960px;">One closing statement that restates the value.</h1>
+      <p class="r csub">A final line with the concrete next step and owner.</p>
+      <div class="r cmeta"><span>contact@example.com</span><span>Project channel</span></div>
+    </section>
+
+  </div>
+</div>
+
+<div id="bar"></div>
+<div id="dots"></div>
+<div id="counter"><b>1</b> / <span id="total">6</span></div>
+<div id="hint">← → / space · click sides · swipe</div>
+
+<script>
+/* ---- deck engine: scale-to-fit, nav (keys/click/swipe/dots), progress ---- */
+(function(){
+  var slides=[].slice.call(document.querySelectorAll('.slide'));
+  var n=slides.length,i=0;
+  var canvas=document.getElementById('canvas'),bar=document.getElementById('bar'),
+      counter=document.getElementById('counter'),hint=document.getElementById('hint'),
+      dotsWrap=document.getElementById('dots');
+  document.getElementById('total').textContent=n;
+  for(var d=0;d<n;d++){var dot=document.createElement('i');dot.dataset.i=d;
+    dot.addEventListener('click',function(e){go(+e.target.dataset.i);});dotsWrap.appendChild(dot);}
+  var dots=[].slice.call(dotsWrap.children);
+
+  function triggerMotion(s){ s.querySelectorAll('animateMotion').forEach(function(am){try{am.beginElement();}catch(e){}}); }
+  function render(){
+    slides.forEach(function(s,idx){s.classList.toggle('active',idx===i);});
+    dots.forEach(function(dt,idx){dt.classList.toggle('on',idx===i);});
+    bar.style.width=((i+1)/n*100)+'%';
+    counter.querySelector('b').textContent=(i+1);
+    if(i>0)hint.classList.add('gone');
+    triggerMotion(slides[i]);
+  }
+  function go(t){i=Math.max(0,Math.min(n-1,t));render();}
+  function next(){go(i+1);} function prev(){go(i-1);}
+  function fit(){canvas.style.transform='scale('+Math.min(window.innerWidth/1280,window.innerHeight/720)+')';}
+  window.addEventListener('resize',fit); window.addEventListener('orientationchange',fit); fit();
+  document.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight'||e.key===' '||e.key==='Enter'||e.key==='PageDown'){e.preventDefault();next();}
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();prev();}
+    else if(e.key==='Home')go(0); else if(e.key==='End')go(n-1);});
+  document.getElementById('stage').addEventListener('click',function(e){
+    if(e.target.closest('a'))return;                          /* let links work */
+    if(e.clientX<window.innerWidth*0.5)prev();else next();});
+  var x0=null,y0=null;
+  document.addEventListener('touchstart',function(e){x0=e.touches[0].clientX;y0=e.touches[0].clientY;},{passive:true});
+  document.addEventListener('touchend',function(e){if(x0===null)return;
+    var dx=e.changedTouches[0].clientX-x0,dy=e.changedTouches[0].clientY-y0;
+    if(Math.abs(dx)>45&&Math.abs(dx)>Math.abs(dy)){dx<0?next():prev();}x0=y0=null;},{passive:true});
+  render();
+})();
+</script>
+</body>
+</html>

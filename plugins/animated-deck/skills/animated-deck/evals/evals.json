@@ -1,0 +1,102 @@
+{
+  "skill_name": "animated-deck",
+  "evals": [
+    {
+      "id": 0,
+      "name": "engineering-explainer",
+      "prompt": "Build me a slide deck explaining our new caching layer to the engineering team. Cover: the problem (the Postgres primary gets hammered ~12k reads/sec on hot product pages), the approach (Redis in front, cache-aside with a 30s TTL), a diagram of the request flow (client -> cache -> DB on miss), the results (cache hit rate ~86%, p99 read latency dropped from 215ms to 19ms, DB read load down ~7x), and a short rollout plan. I want it animated and as a single HTML file I can present full-screen.",
+      "expected_output": "A single self-contained .html deck: title, problem, an animated request-flow diagram (client->cache->DB), a before/after latency comparison, rollout, close. Scales to fit, keyboard/click nav, animations on each slide.",
+      "files": []
+    },
+    {
+      "id": 1,
+      "name": "doc-to-deck",
+      "prompt": "Turn the attached incident postmortem into a futuristic, animated presentation I can share with the wider team. Single HTML file, dark theme, a timeline/flow of what happened, and a slide on the fix. Keep it tight, around 6-7 slides.",
+      "expected_output": "A single .html animated deck derived from the postmortem: title, impact summary, an animated timeline/flow of the incident, root cause, the fix, prevention. Dark/futuristic theme. Facts taken from the doc, not invented.",
+      "files": ["files/postmortem.md"]
+    },
+    {
+      "id": 2,
+      "name": "pitch-mobile",
+      "prompt": "Make a quick pitch deck for a side project of mine: a CLI tool called 'ctxzip' that compresses the context you send to an LLM so you pay fewer tokens. 5-6 slides, dark theme, include a before/after token comparison (about 40k tokens down to 6k) and a small diagram of how it sits between your shell and the model. It needs to look good on my phone too since I'll show people from there.",
+      "expected_output": "A single .html pitch deck, 5-6 slides, dark theme: hook, problem, how it works (small diagram), before/after token calc, close. Must scale to a phone viewport (responsive canvas). Animated.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "workshop-one-pager",
+      "prompt": "Build me a presentation for an internal engineering workshop about our new 'CodeLens' context platform for bug fixing. The audience is senior engineers and delivery managers, so it needs to look like a professional consulting deck — light corporate style, not a flashy dark theme. The key slide must tell the whole story on one slide: (1) current challenges — fragmented context across code/docs/tickets, a huge legacy codebase (~40M LOC across ~60 subsystems), slow manual investigation, weak impact traceability, and results that depend on who does the work; (2) the CodeLens knowledge base in the middle — a source map connecting requirements, specs, code, tests and defect history, plus an impact evidence chain (change -> impacted -> evidence -> decision); (3) the skills it enables — standardized bug analysis, impact analysis, code review support, test case selection; and on the right the outcomes: faster bug resolution, high-quality evidence, consistent delivery, less rework. Finish that slide with a bottom strip showing the progression from manual context hunting to consistent evidence-based delivery. 4-5 slides total: cover, agenda, that big slide, and a closing. Single HTML file, animated.",
+      "expected_output": "A light corporate deck whose centrepiece is a consulting-style poster slide: numbered red/blue/green stage panels with icon cards, a hub/source-map cluster, an evidence chain, outcome chips with checks, and a bottom progression band. All text legible (>=14px), fits 1280x720, animated per slide.",
+      "assertions": [
+        "Single self-contained HTML deck (no external script src references)",
+        "Fixed 1280x720 canvas with the seedable nav engine token var n=slides.length,i=0;",
+        "Reveal/diagram animation gated on .slide.active so it replays on revisit",
+        "prefers-reduced-motion support block present",
+        "Light corporate theme: white/light canvas with a dark navy/blue header band, not a dark neon theme",
+        "No SVG diagram text below 14px and no check_diagram.js failures",
+        "Numbered stage panels 1-2-3 with semantic tones (red challenge, blue core, green skills)",
+        "Central hub/source-map cluster with at least 4 satellite nodes (requirements/specs/code/tests/history)",
+        "Evidence chain change -> impacted -> evidence -> decision appears as a small flow",
+        "At least 4 outcome cards/chips with check styling on the outcomes side",
+        "Full-width bottom progression band (manual hunting -> shared context -> consistent delivery)"
+      ],
+      "files": []
+    },
+    {
+      "id": 4,
+      "name": "before-after-kb",
+      "prompt": "I need slides for a lunch-and-learn pitching our team's knowledge base initiative ('TeamBrain') to management. Professional corporate look, white background — think consulting-firm slides. The centerpiece slide compares life WITHOUT the knowledge base (documents, tickets, source code, chat threads and individual know-how all scattered, nobody knows what's where — results: prompt-dependent output, long onboarding, repeated questions, inconsistent answers) versus WITH TeamBrain (code graph, docs/specs, defect history and standards feeding one unified knowledge base that serves the AI assistant, developers, reviewers and PMs — outcomes: faster onboarding, consistent reviews, less rework). Put a 3-step 'how it learns' column between the two sides: understand -> connect -> contextualize. End the slide with a key takeaway bar. Around 4 slides, single self-contained HTML, animated but tasteful.",
+      "expected_output": "A light corporate deck with a before/after contrast poster: red 'without' panel with scattered sources, a centre 3-step column, a green 'with' panel where sources converge into a knowledge base and fan out to consumers, outcome chips, and a key-takeaway band.",
+      "assertions": [
+        "Single self-contained HTML deck (no external script src references)",
+        "Fixed 1280x720 canvas with the seedable nav engine token var n=slides.length,i=0;",
+        "Reveal/diagram animation gated on .slide.active so it replays on revisit",
+        "prefers-reduced-motion support block present",
+        "Light corporate theme: white/light canvas with a dark navy/blue header band, not a dark neon theme",
+        "No SVG diagram text below 14px and no check_diagram.js failures",
+        "Side-by-side WITHOUT (red-toned) vs WITH (green-toned) contrast panels on one slide",
+        "WITHOUT side shows a scattered-sources motif (dashed/chaotic links or question marks)",
+        "Three-step learning column present: understand -> connect -> contextualize",
+        "WITH side shows sources converging into a unified knowledge base and fanning out to at least 3 consumer roles",
+        "Key takeaway band at the bottom of the comparison slide"
+      ],
+      "files": []
+    },
+    {
+      "id": 5,
+      "name": "architecture-pipeline",
+      "prompt": "Create an animated HTML deck (one file) documenting the architecture of our internal RAG platform 'DocMesh' for an enterprise architecture review board. Corporate, light, dense and precise — think vendor reference-architecture slides. The main slide is the end-to-end architecture in 4 numbered stages: 1) data sources (git repositories, Confluence pages, test cases & defect history, coding standards); 2) ingestion & understanding with two parallel tracks — a document track (preprocessing -> semantic chunking -> entity recognition -> embedding) and a code track (AST parsing -> call-graph extraction -> dependency mapping -> code embedding); 3) the unified knowledge core — a living knowledge graph linking specs, modules, classes, design decisions and business logic; 4) context delivery — an MCP/REST gateway with retrieval & ranking serving agents (IDE assistant, review bot, CI agent, chat assistant). Add a bottom bar covering data privacy, access control, audit/traceability and enterprise readiness. Cover + architecture slide + one 'what it enables' slide + close.",
+      "expected_output": "A light corporate deck whose main slide is a 4-stage reference architecture: numbered stage columns, two vertical ingestion mini-chains, a knowledge-graph mesh core with labelled entities, a delivery column with gateway and agents, and a bottom compliance strip.",
+      "assertions": [
+        "Single self-contained HTML deck (no external script src references)",
+        "Fixed 1280x720 canvas with the seedable nav engine token var n=slides.length,i=0;",
+        "Reveal/diagram animation gated on .slide.active so it replays on revisit",
+        "prefers-reduced-motion support block present",
+        "Light corporate theme: white/light canvas with a dark navy/blue header band, not a dark neon theme",
+        "No SVG diagram text below 14px and no check_diagram.js failures",
+        "Four numbered architecture stages laid out left-to-right (sources, ingestion, knowledge core, delivery)",
+        "Two parallel ingestion mini-chains (document track and code track) with at least 3 steps each",
+        "Knowledge core drawn as a graph/mesh with at least 4 labelled entities (spec/module/class/decision/logic)",
+        "Delivery stage lists a gateway plus at least 3 consuming agents",
+        "Bottom compliance strip covering privacy, access control, audit and enterprise readiness"
+      ],
+      "files": []
+    },
+    {
+      "id": 6,
+      "name": "reuse-html-template",
+      "prompt": "Our team's previous quarterly deck is at <path-to-branded-deck.html> — use it as the template. Same cover style, same header band, same closing slide; don't change our branding. Build a new 4-slide animated deck introducing 'Streamline', our release-readiness workflow: the four gates every release candidate passes (code-freeze checks, full regression suite, security scan, release sign-off), a slide showing how a candidate moves gate to gate with what happens on a failure (back to dev, fix, re-enter), and the outcomes we expect (fewer hotfixes, predictable release dates, auditable go/no-go decisions). Single self-contained HTML file.",
+      "expected_output": "A new deck whose cover, header band and closing slide are inherited verbatim from the provided template deck (scraped via deck_chrome.py, brand wordmark and band gradient intact, no placeholder branding), with entirely new Streamline content in the body.",
+      "assertions": [
+        "Single self-contained HTML deck (no external script src references)",
+        "Fixed 1280x720 canvas with the seedable nav engine token var n=slides.length,i=0;",
+        "Cover slide inherited from the template deck's cover (brand wordmark and cover treatment), not newly invented",
+        "Header band inherited on body slides with the template's band styling and brand wordmark",
+        "Closing slide inherited from the template deck's end slide styling",
+        "No placeholder branding from stock templates in the deliverable",
+        "New requested content present; the template's old body content not carried over"
+      ],
+      "files": ["<path-to-branded-deck.html>"]
+    }
+  ]
+}

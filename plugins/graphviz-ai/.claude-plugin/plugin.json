@@ -1,0 +1,21 @@
+{
+  "name": "graphviz-ai",
+  "version": "1.0.0",
+  "description": "Guide + tooling for the graphviz_master AI integration and a strict-layout diagram mode. Bundles the graphviz-ai skill: DotGenerator, LayoutPlanner, VisionClient, validation pipeline, and a hand-routed SVG generator (straight/orthogonal arrows, no overlaps, centered ports, hop bridges at crossings) with an R1-R9 rule audit (incl. min_font 14 readable-text floor), declarative alignment, high-res PNG export (--scale), and native-shape PowerPoint export (spec_to_pptx.py).",
+  "author": {
+    "name": "longvh38",
+    "email": "cuder0609@gmail.com"
+  },
+  "homepage": "https://github.com/LeoHoangLongVu/skills-marketplace",
+  "keywords": [
+    "graphviz",
+    "dot",
+    "diagram",
+    "svg",
+    "layout",
+    "orthogonal",
+    "vision",
+    "pptx",
+    "powerpoint"
+  ]
+}

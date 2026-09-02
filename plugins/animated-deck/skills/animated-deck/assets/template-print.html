@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>DECK TITLE</title>
+<style>
+/* ============================================================
+   THEME — swap this :root block to restyle the whole deck.
+   Two ready presets below; the NEON one is active.
+   ============================================================ */
+:root{
+  /* ---- NEON CYBER (active) ---- */
+  --bg:#080b1c; --bg2:#0e1430; --panel:#161d40; --panel2:#1e2752;
+  --line:#2a3360; --line2:#3c4888;
+  --ink:#f1f4ff; --ink2:#b4bdec; --ink3:#8089bd;
+  --cyan:#1ff0e6; --mag:#ff45e0; --blue:#5b8cff; --green:#52ffa8; --amber:#ffd24d; --red:#ff5e86; --violet:#b98cff;
+  --accent:var(--cyan); --accent2:var(--mag);
+  --mono:'JetBrains Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+}
+/* ---- TERMINAL AMBER (alt — paste over :root to use) ----
+:root{
+  --bg:#09090c; --bg2:#0d0d12; --panel:#13131b; --panel2:#181821;
+  --line:#26262f; --line2:#34343f;
+  --ink:#eceae2; --ink2:#a6a4af; --ink3:#6a6874;
+  --cyan:#4ec9b0; --mag:#c77dba; --blue:#6aa6ff; --green:#7ee787; --amber:#ffb02e; --red:#ff6b6b; --violet:#c77dba;
+  --accent:var(--amber); --accent2:var(--teal);
+  --mono:'JetBrains Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+}
+*/
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{height:100%; overflow:hidden; background:#000; font-family:var(--mono); color:var(--ink);}
+
+/* ---- viewport + scaled 1280×720 canvas (fits any screen) ---- */
+#stage{position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:#000;}
+#canvas{width:1280px; height:720px; position:relative; flex:none; transform-origin:center center;
+  background:var(--bg); overflow:hidden;}
+#canvas::before{content:""; position:absolute; inset:0; z-index:0; pointer-events:none;
+  background:
+    radial-gradient(ellipse 50% 45% at 82% 12%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 60%),
+    radial-gradient(ellipse 55% 50% at 12% 92%, color-mix(in srgb, var(--accent2) 10%, transparent), transparent 60%);}
+#canvas::after{content:""; position:absolute; inset:0; z-index:0; pointer-events:none;
+  background-image:linear-gradient(color-mix(in srgb, var(--blue) 6%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--blue) 6%, transparent) 1px, transparent 1px);
+  background-size:40px 40px;
+  mask-image:radial-gradient(ellipse 95% 80% at 50% 40%, #000 30%, transparent 100%);}
+
+/* ---- slides ---- */
+.slide{position:absolute; inset:0; z-index:1; padding:58px 72px;
+  display:flex; flex-direction:column; justify-content:center;
+  opacity:0; visibility:hidden; transform:translateY(16px);
+  transition:opacity .45s ease, transform .45s cubic-bezier(.2,.8,.2,1), visibility 0s linear .45s;}
+.slide.active{opacity:1; visibility:visible; transform:none;
+  transition:opacity .5s ease, transform .5s cubic-bezier(.2,.8,.2,1);}
+
+/* ---- reveal: children with class .r fade/slide in, staggered.
+   Gated on .slide.active so the animation REPLAYS every visit. ---- */
+.slide .r{opacity:0; transform:translateY(14px); transition:opacity .5s ease, transform .5s cubic-bezier(.2,.8,.2,1);}
+.slide.active .r{opacity:1; transform:none;}
+.slide.active .r:nth-child(1){transition-delay:.06s}.slide.active .r:nth-child(2){transition-delay:.14s}
+.slide.active .r:nth-child(3){transition-delay:.22s}.slide.active .r:nth-child(4){transition-delay:.30s}
+.slide.active .r:nth-child(5){transition-delay:.38s}.slide.active .r:nth-child(6){transition-delay:.46s}
+
+/* ---- typography ---- */
+.eyebrow{font-size:13px; letter-spacing:.34em; text-transform:uppercase; color:var(--accent);
+  text-shadow:0 0 14px color-mix(in srgb, var(--accent) 55%, transparent); margin-bottom:10px;}
+h1{font-size:72px; font-weight:800; letter-spacing:-.01em; line-height:1.03; text-shadow:0 0 30px color-mix(in srgb,var(--blue) 35%,transparent);}
+h1 b{color:var(--accent);}
+h2{font-size:40px; font-weight:800; letter-spacing:-.01em; line-height:1.1;}
+h2 b{color:var(--accent);}
+.lede{color:var(--ink2); font-size:20px; max-width:900px; line-height:1.75;}
+.meta{color:var(--ink3); font-size:14px; margin-top:24px;} .meta b{color:var(--accent);}
+.hl{color:var(--accent); font-weight:700;} .hlg{color:var(--green); font-weight:700;}
+code{background:color-mix(in srgb,var(--blue) 8%,transparent); border:1px solid var(--line2); border-radius:5px; padding:1px 7px; font-size:.92em; color:var(--accent);}
+ul.clean{list-style:none; margin:16px 0;}
+ul.clean li{padding:12px 0 12px 32px; position:relative; color:var(--ink2); font-size:19px; line-height:1.6;}
+ul.clean li::before{content:"▸"; position:absolute; left:4px; color:var(--accent2);}
+ul.clean li b{color:var(--ink);}
+
+/* ---- stat cards ---- */
+.grid3{display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-top:28px;}
+.stat{border:1px solid var(--line2); border-radius:14px; padding:26px 22px;
+  background:linear-gradient(160deg, color-mix(in srgb,var(--panel) 90%,transparent), color-mix(in srgb,var(--bg) 70%,transparent));}
+.stat .v{font-size:34px; font-weight:800; color:var(--accent); text-shadow:0 0 18px color-mix(in srgb,var(--accent) 50%,transparent);}
+.stat .l{color:var(--ink3); font-size:15px; margin-top:10px; line-height:1.6;} .stat .l b{color:var(--ink2);}
+
+/* ---- calc strip (before → after = saved) ---- */
+.calc{display:flex; align-items:center; margin-top:28px; border:1px solid var(--line2); border-radius:14px;
+  background:linear-gradient(160deg, color-mix(in srgb,var(--panel) 85%,transparent), color-mix(in srgb,var(--bg) 60%,transparent)); padding:22px 24px;}
+.calc .cell{flex:1; text-align:center;}
+.calc .lab{font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink3);}
+.calc .num{font-size:36px; font-weight:800; margin-top:8px;}
+.calc .u{font-size:13px; color:var(--ink3); margin-top:5px;}
+.calc .in .num{color:var(--red);} .calc .out .num{color:var(--blue);} .calc .save .num{color:var(--green);}
+.calc .op{flex:0 0 auto; color:var(--ink3); font-size:28px; padding:0 16px;}
+
+/* ---- table ---- */
+table{border-collapse:collapse; width:100%; font-size:16px; margin-top:22px;}
+th,td{border:1px solid var(--line2); padding:13px 16px; text-align:left; line-height:1.55;}
+th{background:var(--panel2); color:var(--accent); font-weight:700;}
+td{color:var(--ink2);} td b{color:var(--ink);} td code{color:var(--accent);}
+
+/* ---- note ---- */
+.note2{font-size:14px; color:var(--ink3); margin-top:18px; line-height:1.7;} .note2 b{color:var(--ink2);}
+
+/* ============================================================
+   GRAPH / DIAGRAM ANIMATION  (the differentiator)
+   Edges draw via SVG pathLength="1"; nodes pop in; both gated
+   on .slide.active so they replay each visit. See references/
+   animation-cookbook.md for the full pattern catalogue.
+   ============================================================ */
+.gwrap{margin-top:14px; display:flex; justify-content:center;}
+svg.graph{width:100%; max-width:1140px; height:auto; overflow:visible;}
+.ge{stroke:var(--accent); stroke-width:2.4; fill:none; opacity:.78;
+  filter:drop-shadow(0 0 5px color-mix(in srgb,var(--accent) 70%,transparent));
+  stroke-dasharray:1; stroke-dashoffset:1;}            /* pathLength="1" → dash normalised */
+.slide.active .ge{animation:draw .7s ease forwards;}
+@keyframes draw{to{stroke-dashoffset:0;}}
+.ge.m{stroke:var(--accent2); filter:drop-shadow(0 0 5px color-mix(in srgb,var(--accent2) 70%,transparent));}
+.ge.dim{opacity:.16; filter:none;}
+
+.gn{opacity:0; transform-box:fill-box; transform-origin:center;}   /* fill-box → node scales in place */
+.slide.active .gn{animation:pop .55s cubic-bezier(.2,.8,.2,1) forwards;}
+@keyframes pop{from{opacity:0; transform:scale(.6);}to{opacity:1; transform:scale(1);}}
+.gn text{font-family:var(--mono); fill:var(--ink); font-weight:700; text-anchor:middle;}
+.gn .t{font-size:16px;} .gn .s{font-size:11px; fill:var(--ink3); font-weight:400;}
+.gn.a rect{fill:color-mix(in srgb,var(--cyan) 18%,transparent); stroke:var(--cyan); filter:drop-shadow(0 0 10px color-mix(in srgb,var(--cyan) 60%,transparent));}
+.gn.b rect{fill:color-mix(in srgb,var(--mag) 17%,transparent);  stroke:var(--mag);  filter:drop-shadow(0 0 10px color-mix(in srgb,var(--mag) 55%,transparent));}
+.gn.c rect{fill:color-mix(in srgb,var(--green) 17%,transparent); stroke:var(--green); filter:drop-shadow(0 0 10px color-mix(in srgb,var(--green) 50%,transparent));}
+.gn.d rect{fill:color-mix(in srgb,var(--amber) 17%,transparent); stroke:var(--amber); filter:drop-shadow(0 0 10px color-mix(in srgb,var(--amber) 50%,transparent));}
+.gn.dim{opacity:.22 !important;}
+.slide.active .gn.dim{animation:popdim .55s ease forwards;}
+@keyframes popdim{from{opacity:0;}to{opacity:.22;}}
+.gn.pulse rect{animation:nodepulse 1.5s ease-in-out infinite;}
+@keyframes nodepulse{0%,100%{filter:drop-shadow(0 0 6px currentColor);}50%{filter:drop-shadow(0 0 20px currentColor);}}
+/* blast rings — for impact / radius effects */
+.ring{fill:none; stroke:var(--red); stroke-width:2; opacity:0; transform-box:fill-box; transform-origin:center;}
+.slide.active .ring{animation:blast 2.1s ease-out infinite;}
+@keyframes blast{0%{opacity:.7; transform:scale(.35);}100%{opacity:0; transform:scale(1.3);}}
+
+/* horizontal pipeline flow */
+.flow{display:flex; align-items:stretch; gap:8px; margin-top:24px; flex-wrap:wrap;}
+.flow .fn{flex:1 1 0; min-width:118px; border:1px solid var(--line2); border-radius:10px; background:var(--bg2);
+  padding:14px 12px; text-align:center; font-size:13px; font-weight:700; color:var(--ink);}
+.flow .fn span{display:block; margin-top:6px; font-size:11px; font-weight:400; color:var(--ink3); line-height:1.55;}
+.flow .fn.on{border-color:var(--accent); color:var(--accent);}
+.flow .farrow{display:flex; align-items:center; color:var(--ink3); font-size:20px; font-weight:800;}
+
+/* ---- chrome: progress bar, counter, hint, dots ---- */
+#bar{position:fixed; left:0; bottom:0; height:3px; background:linear-gradient(90deg,var(--accent),var(--accent2)); z-index:10; transition:width .4s cubic-bezier(.2,.8,.2,1); box-shadow:0 0 14px var(--accent);}
+#counter{position:fixed; right:16px; bottom:14px; z-index:10; font-size:13px; color:var(--ink3); background:color-mix(in srgb,var(--bg) 70%,transparent); padding:4px 12px; border:1px solid var(--line2); border-radius:999px;}
+#counter b{color:var(--accent);}
+#hint{position:fixed; left:16px; bottom:14px; z-index:10; font-size:12px; color:var(--ink3); transition:opacity .6s;} #hint.gone{opacity:0;}
+#dots{position:fixed; left:50%; transform:translateX(-50%); bottom:13px; z-index:10; display:flex; gap:7px;}
+#dots i{width:7px; height:7px; border-radius:50%; background:var(--line2); cursor:pointer; transition:all .25s;}
+#dots i.on{background:var(--accent); box-shadow:0 0 10px var(--accent); transform:scale(1.3);}
+@media(prefers-reduced-motion:reduce){
+  .slide,.slide .r,.ge,.gn{transition:opacity .3s!important; animation:none!important; opacity:1!important; stroke-dashoffset:0!important; transform:none!important;}
+}
+</style>
+<style id="__print">
+@page{ size:1280px 720px; margin:0; }
+html,body{ height:auto; overflow:visible; background:#000; }
+#stage{ position:static; display:block; inset:auto; }
+#canvas{ position:static; width:1280px; height:auto; transform:none!important; margin:0 auto; border:none; background:transparent; overflow:visible; }
+#canvas::before,#canvas::after{ display:none!important; }
+.slide{ position:relative!important; inset:auto!important; opacity:1!important; visibility:visible!important; transform:none!important; width:1280px; height:720px; overflow:hidden; background:var(--bg); border:1px solid var(--line); break-after:page; page-break-after:always; }
+.slide:last-child{ break-after:auto; page-break-after:auto; }
+.slide .r{ opacity:1!important; transform:none!important; transition:none!important; }
+.slide::before{ content:""; position:absolute; inset:0; z-index:0; pointer-events:none;
+  background:radial-gradient(ellipse 50% 45% at 82% 12%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 60%),
+             radial-gradient(ellipse 55% 50% at 12% 92%, color-mix(in srgb, var(--accent2) 10%, transparent), transparent 60%); }
+#bar,#counter,#hint,#dots{ display:none!important; }
+*{ -webkit-print-color-adjust:exact!important; print-color-adjust:exact!important; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="canvas">
+
+    <!-- ============ SLIDE 1 · TITLE ============ -->
+    <section class="slide">
+      <div class="r eyebrow">Section label · context</div>
+      <h1 class="r">The <b>Headline</b></h1>
+      <h1 class="r" style="font-size:34px; color:var(--ink2); margin-top:8px; text-shadow:none; font-weight:600">A formal subtitle that frames the topic in one line.</h1>
+      <p class="r lede" style="margin-top:20px">One or two sentences of context. State the premise plainly; keep it short.</p>
+      <div class="r meta">Source / grounding · <b>one credibility detail</b></div>
+    </section>
+
+    <!-- ============ SLIDE 2 · STAT CARDS ============ -->
+    <section class="slide">
+      <div class="r eyebrow">The problem</div>
+      <h2 class="r">Three facts, one per card</h2>
+      <div class="r grid3">
+        <div class="stat"><div class="v">fact one</div><div class="l">A concise sentence with a <b>bold key term</b> and a real number.</div></div>
+        <div class="stat"><div class="v">fact two</div><div class="l">Each card carries a single idea. Do not crowd them.</div></div>
+        <div class="stat"><div class="v">fact three</div><div class="l">The value line is the headline; the label line explains it.</div></div>
+      </div>
+      <p class="r note2">A closing line that ties the three together.</p>
+    </section>
+
+    <!-- ============ SLIDE 3 · ANIMATED GRAPH ============ -->
+    <!-- Nodes pop in; edges draw along their path. Endpoints sit ON the
+         node borders (compute: rect edge = x or x+w / y+h/2). -->
+    <section class="slide">
+      <div class="r eyebrow">A real example</div>
+      <h2 class="r">Nodes are <b>concepts</b>. Edges are <b>relationships</b>.</h2>
+      <div class="r gwrap">
+        <svg class="graph" viewBox="0 0 1000 300">
+          <defs>
+            <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="var(--accent)"/></marker>
+          </defs>
+          <!-- edge: starts on A's right edge (225,150), ends on B's left edge (415,150) -->
+          <line class="ge" x1="225" y1="150" x2="415" y2="150" pathLength="1" style="animation-delay:.5s" marker-end="url(#ar)"/>
+          <line class="ge m" x1="585" y1="150" x2="775" y2="150" pathLength="1" style="animation-delay:.9s" marker-end="url(#ar)"/>
+          <g class="gn a" style="animation-delay:.1s"><rect x="70" y="120" width="155" height="60" rx="10"/><text class="t" x="147" y="146">node A</text><text class="s" x="147" y="166">label</text></g>
+          <text x="320" y="138" fill="var(--accent)" font-size="13" font-weight="700" text-anchor="middle" style="opacity:.8">RELATES</text>
+          <g class="gn b" style="animation-delay:.55s"><rect x="415" y="120" width="170" height="60" rx="10"/><text class="t" x="500" y="146">node B</text><text class="s" x="500" y="166">label</text></g>
+          <g class="gn c" style="animation-delay:.95s"><rect x="775" y="120" width="150" height="60" rx="10"/><text class="t" x="850" y="146">node C</text><text class="s" x="850" y="166">label</text></g>
+        </svg>
+      </div>
+      <p class="r note2" style="text-align:center">Caption explaining what the diagram shows.</p>
+    </section>
+
+    <!-- ============ SLIDE 4 · PIPELINE FLOW ============ -->
+    <section class="slide">
+      <div class="r eyebrow">How it works</div>
+      <h2 class="r">A staged pipeline</h2>
+      <div class="r flow">
+        <div class="fn">① First<span>short detail</span></div>
+        <div class="farrow">→</div>
+        <div class="fn">② Second<span>short detail</span></div>
+        <div class="farrow">→</div>
+        <div class="fn on">③ Key step<span>highlighted</span></div>
+        <div class="farrow">→</div>
+        <div class="fn">④ Fourth<span>short detail</span></div>
+      </div>
+      <p class="r note2" style="text-align:center">Name the hard step and say why it matters.</p>
+    </section>
+
+    <!-- ============ SLIDE 5 · CALC / PAYOFF ============ -->
+    <section class="slide">
+      <div class="r eyebrow">The payoff</div>
+      <h2 class="r">Before &nbsp;vs&nbsp; after</h2>
+      <p class="r lede" style="margin-top:8px">One sentence framing the comparison.</p>
+      <div class="r calc">
+        <div class="cell in"><div class="lab">Before</div><div class="num">~100</div><div class="u">unit</div></div>
+        <div class="op">→</div>
+        <div class="cell out"><div class="lab">After</div><div class="num">~10</div><div class="u">unit</div></div>
+        <div class="op">=</div>
+        <div class="cell save"><div class="lab">Saved</div><div class="num">~90%</div><div class="u">and a benefit</div></div>
+      </div>
+    </section>
+
+    <!-- ============ SLIDE 6 · CLOSE ============ -->
+    <section class="slide" style="align-items:flex-start">
+      <div class="r eyebrow">Guiding principle</div>
+      <h1 class="r" style="font-size:50px; max-width:1040px">The one-line takeaway.<br><span class="hl">Made memorable.</span></h1>
+      <p class="r lede" style="margin-top:14px">A final sentence that restates the value without hedging.</p>
+    </section>
+
+  </div>
+</div>
+
+<div id="bar"></div>
+<div id="dots"></div>
+<div id="counter"><b>1</b> / <span id="total">6</span></div>
+<div id="hint">← → / space · click sides · swipe</div>
+
+<script>
+/* ---- deck engine: scale-to-fit, nav (keys/click/swipe/dots), progress ---- */
+(function(){
+  var slides=[].slice.call(document.querySelectorAll('.slide'));
+  var n=slides.length,i=0;
+  var canvas=document.getElementById('canvas'),bar=document.getElementById('bar'),
+      counter=document.getElementById('counter'),hint=document.getElementById('hint'),
+      dotsWrap=document.getElementById('dots');
+  document.getElementById('total').textContent=n;
+  for(var d=0;d<n;d++){var dot=document.createElement('i');dot.dataset.i=d;
+    dot.addEventListener('click',function(e){go(+e.target.dataset.i);});dotsWrap.appendChild(dot);}
+  var dots=[].slice.call(dotsWrap.children);
+
+  function triggerMotion(s){ s.querySelectorAll('animateMotion').forEach(function(am){try{am.beginElement();}catch(e){}}); }
+  function render(){
+    slides.forEach(function(s,idx){s.classList.toggle('active',idx===i);});
+    dots.forEach(function(dt,idx){dt.classList.toggle('on',idx===i);});
+    bar.style.width=((i+1)/n*100)+'%';
+    counter.querySelector('b').textContent=(i+1);
+    if(i>0)hint.classList.add('gone');
+    triggerMotion(slides[i]);
+  }
+  function go(t){i=Math.max(0,Math.min(n-1,t));render();}
+  function next(){go(i+1);} function prev(){go(i-1);}
+  function fit(){canvas.style.transform='scale('+Math.min(window.innerWidth/1280,window.innerHeight/720)+')';}
+  window.addEventListener('resize',fit); window.addEventListener('orientationchange',fit); fit();
+  document.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight'||e.key===' '||e.key==='Enter'||e.key==='PageDown'){e.preventDefault();next();}
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();prev();}
+    else if(e.key==='Home')go(0); else if(e.key==='End')go(n-1);});
+  document.getElementById('stage').addEventListener('click',function(e){
+    if(e.target.closest('a'))return;                          /* let links work */
+    if(e.clientX<window.innerWidth*0.5)prev();else next();});
+  var x0=null,y0=null;
+  document.addEventListener('touchstart',function(e){x0=e.touches[0].clientX;y0=e.touches[0].clientY;},{passive:true});
+  document.addEventListener('touchend',function(e){if(x0===null)return;
+    var dx=e.changedTouches[0].clientX-x0,dy=e.changedTouches[0].clientY-y0;
+    if(Math.abs(dx)>45&&Math.abs(dx)>Math.abs(dy)){dx<0?next():prev();}x0=y0=null;},{passive:true});
+  render();
+})();
+</script>
+</body>
+</html>

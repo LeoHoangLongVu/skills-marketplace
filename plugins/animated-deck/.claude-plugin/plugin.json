@@ -1,0 +1,20 @@
+{
+  "name": "animated-deck",
+  "version": "1.0.0",
+  "description": "Build a self-contained, animated single-file HTML presentation deck — scales to any screen, keyboard/click/swipe nav, animated content + SVG node-edge diagrams, PDF export, and on-brand theming from a .pptx/.potx template. Bundles the deck template(s) and diagram/animation references.",
+  "author": {
+    "name": "longvh38",
+    "email": "cuder0609@gmail.com"
+  },
+  "homepage": "https://github.com/LeoHoangLongVu/skills-marketplace",
+  "keywords": [
+    "presentation",
+    "slides",
+    "deck",
+    "html",
+    "animation",
+    "svg-diagram",
+    "pptx",
+    "pdf-export"
+  ]
+}

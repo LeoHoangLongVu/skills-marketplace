@@ -25,6 +25,44 @@
         "traceability",
         "governance"
       ]
+    },
+    {
+      "name": "animated-deck",
+      "source": "./plugins/animated-deck",
+      "description": "Build a self-contained, animated single-file HTML presentation deck — scales to any screen, keyboard/click/swipe nav, animated content + SVG node-edge diagrams, PDF export, and on-brand theming from a .pptx/.potx template. Bundles the deck template(s) and diagram/animation references.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Long VH"
+      },
+      "keywords": [
+        "presentation",
+        "slides",
+        "deck",
+        "html",
+        "animation",
+        "svg-diagram",
+        "pptx",
+        "pdf-export"
+      ]
+    },
+    {
+      "name": "graphviz-ai",
+      "source": "./plugins/graphviz-ai",
+      "description": "Guide + tooling for the graphviz_master AI integration and a strict-layout diagram mode. Bundles the graphviz-ai skill: DotGenerator, LayoutPlanner, VisionClient, validation pipeline, and a hand-routed SVG generator (straight/orthogonal arrows, no overlaps, centered ports, hop bridges at crossings) with an R1-R9 rule audit (incl. min_font 14 readable-text floor), declarative alignment, high-res PNG export (--scale), and native-shape PowerPoint export (spec_to_pptx.py).",
+      "version": "1.0.0",
+      "author": {
+        "name": "Long VH"
+      },
+      "keywords": [
+        "graphviz",
+        "dot",
+        "diagram",
+        "svg",
+        "layout",
+        "orthogonal",
+        "vision",
+        "pptx"
+      ]
     }
   ]
 }

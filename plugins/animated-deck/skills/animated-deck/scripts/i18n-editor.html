@@ -1,0 +1,218 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Animated Deck · Translation Editor</title>
+<style>
+:root{--bg:#0f1116;--panel:#171a21;--line:#2a2f3a;--ink:#e8eaf0;--ink2:#9aa1b0;--ink3:#6b7280;--teal:#2bb3c0;--amber:#ffb02e;--green:#3fb96b;--mono:'JetBrains Mono',ui-monospace,Consolas,monospace;--sans:system-ui,'Segoe UI',sans-serif;}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);display:flex;flex-direction:column;height:100vh}
+header{display:flex;align-items:center;gap:16px;padding:12px 18px;border-bottom:1px solid var(--line);background:var(--panel);flex:none}
+header h1{font-size:15px;font-weight:700;letter-spacing:.02em}
+header .sub{font-size:12px;color:var(--ink3)}
+header .sp{flex:1}
+button,label.btn{font:600 13px var(--sans);color:var(--ink);background:#222733;border:1px solid var(--line);border-radius:8px;padding:8px 14px;cursor:pointer;white-space:nowrap}
+button:hover,label.btn:hover{border-color:var(--teal)}
+button.primary{background:var(--teal);color:#04222a;border-color:var(--teal)}
+button.primary:disabled{opacity:.4;cursor:not-allowed}
+button.ghost{background:transparent}
+input[type=file]{display:none}
+main{flex:1;display:grid;grid-template-columns:1fr 1fr;min-height:0}
+.col{display:flex;flex-direction:column;min-height:0;min-width:0}
+.col.left{border-right:1px solid var(--line)}
+.toolbar{display:flex;gap:10px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line);background:#12151b;flex:none}
+.toolbar input.search{flex:1;background:#0c0e13;border:1px solid var(--line);border-radius:7px;color:var(--ink);padding:7px 10px;font:13px var(--sans)}
+.count{font-size:12px;color:var(--ink3);white-space:nowrap}
+.allbox{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--ink2);white-space:nowrap;cursor:pointer}
+.rows{overflow:auto;padding:6px 14px 40px}
+.row{padding:12px 0;border-bottom:1px solid var(--line)}
+.row .k{font:11px var(--mono);color:var(--amber);letter-spacing:.05em}
+.row .src{font:13px var(--mono);color:var(--ink2);white-space:pre-wrap;word-break:break-word;margin:5px 0 7px;line-height:1.5}
+.row textarea{width:100%;background:#0c0e13;border:1px solid var(--line);border-radius:7px;color:var(--ink);font:13px var(--mono);padding:8px 10px;resize:vertical;min-height:38px;line-height:1.5}
+.row textarea:focus{outline:none;border-color:var(--teal)}
+.row.done textarea{border-left:3px solid var(--green)}
+.row.tech{opacity:.5}
+.empty{padding:50px 24px;text-align:center;color:var(--ink3);font-size:14px;line-height:1.7}
+.empty b{color:var(--ink2)}
+.prevwrap{flex:1;min-height:0;display:flex;flex-direction:column}
+.prevhead{padding:8px 14px;font-size:12px;color:var(--ink3);border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:center}
+iframe{flex:1;border:0;background:#000;width:100%}
+.tag{font:11px var(--mono);padding:2px 8px;border-radius:5px;background:#1c2230;color:var(--teal)}
+kbd{font:11px var(--mono);background:#222733;border:1px solid var(--line);border-radius:4px;padding:1px 5px;color:var(--ink2)}
+</style></head>
+<body>
+<header>
+  <h1>Animated Deck · Translation Editor</h1>
+  <span class="sub" id="fname">no deck loaded</span>
+  <span class="sp"></span>
+  <label class="btn">Open deck<input type="file" id="deckIn" accept=".html,.htm"></label>
+  <label class="btn">Load strings.json<input type="file" id="strIn" accept=".json"></label>
+  <button class="ghost" id="exportStr">Save strings.json</button>
+  <button class="primary" id="apply" disabled>Apply &amp; download deck</button>
+</header>
+<main>
+  <div class="col left">
+    <div class="toolbar">
+      <button class="ghost" id="prev" title="previous slide">◀</button>
+      <span class="count" id="slidepos">slide –</span>
+      <button class="ghost" id="next" title="next slide">▶</button>
+      <label class="allbox"><input type="checkbox" id="showall"> all slides</label>
+      <input class="search" id="search" placeholder="filter…">
+      <span class="count" id="count"></span>
+    </div>
+    <div class="rows" id="rows">
+      <div class="empty">
+        <p><b>Open a deck</b> (the single <kbd>.html</kbd> file) to begin.</p>
+        <p style="margin-top:10px">Every translatable line — headings, text, table cells and SVG diagram labels — is listed with an editable field. Code, paths and identifiers (<kbd>.html</kbd>, <kbd>deck.pptx</kbd>) are detected and left out.</p>
+        <p style="margin-top:10px">Edit the fields, then <b>Apply &amp; download</b> to get a rebuilt single-file deck. Fully offline — no server, no AI.</p>
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="prevwrap">
+      <div class="prevhead"><span class="tag">live preview</span><span id="prevnote">rebuilds on Apply · use the deck's arrow keys / clicks inside</span></div>
+      <iframe id="preview" sandbox="allow-scripts allow-same-origin"></iframe>
+    </div>
+  </div>
+</main>
+<script>
+// ---- same contract as scripts/i18n.py (no LLM, pure DOM) ----
+const TEXT_TAGS=new Set(['H1','H2','H3','H4','P','LI','TD','TH','DIV','TEXT','FIGCAPTION','CAPTION']);
+const INLINE=new Set(['A','B','I','EM','STRONG','CODE','SPAN','BR','SUP','SUB','U','SMALL','MARK','TSPAN','ABBR']);
+const OPAQUE='pre,code,script,style';
+let doc=null, baseName='deck', rows=[], slideCount=0, cur=-1, watchTimer=null;
+const preview=()=>document.getElementById('preview');
+
+const OPAQUE_TAGS=new Set(['PRE','CODE','SCRIPT','STYLE']);
+// a lone token that is a path / filename / identifier (not real prose)
+function isToken(v){ v=v.trim(); return !v.includes(' ') && /[/._:\\]/.test(v); }
+function hasLetters(v){ return /[A-Za-zÀ-ỹ]/.test(v); }
+
+// Key the deck at the PLAIN-TEXT-RUN level so a translator never sees or edits markup.
+// A pure-text element gets data-i18n on itself; an element that mixes text with inline tags
+// (a <code>, <b>, a numbering <span>) has each translatable text RUN wrapped in its own keyed
+// <span>, leaving the inline tags and surrounding spaces untouched.
+function keyDoc(d){
+  // strip any pre-existing keys first, so re-loading an already-keyed deck re-keys cleanly
+  // (otherwise the granular pass would descend into old whole-line keys and double them)
+  d.querySelectorAll('[data-i18n]').forEach(e=>e.removeAttribute('data-i18n'));
+  let n=0; const used=new Set();
+  const fresh=()=>{ let k; do{ n++; k='s'+String(n).padStart(3,'0'); }while(used.has(k)); used.add(k); return k; };
+  function walk(el){
+    if(OPAQUE_TAGS.has(el.tagName)) return;
+    if(el.children.length===0){                       // pure-text leaf
+      const v=el.textContent;
+      if(el.tagName!=='HTML'&&el.tagName!=='BODY'&&hasLetters(v)&&!isToken(v)&&!el.hasAttribute('data-i18n'))
+        el.setAttribute('data-i18n', fresh());
+      return;
+    }
+    const inSvg = !!el.closest('svg');                // never inject HTML <span> into SVG
+    [...el.childNodes].forEach(node=>{
+      if(node.nodeType===3){                          // text run between inline tags
+        if(inSvg) return;
+        const m=node.nodeValue.match(/^(\s*)([\s\S]*?)(\s*)$/);
+        const core=m[2];
+        if(!hasLetters(core)||isToken(core)) return;
+        const frag=d.createDocumentFragment();
+        if(m[1]) frag.appendChild(d.createTextNode(m[1]));
+        const sp=d.createElement('span'); sp.setAttribute('data-i18n',fresh()); sp.textContent=core;
+        frag.appendChild(sp);
+        if(m[3]) frag.appendChild(d.createTextNode(m[3]));
+        node.parentNode.replaceChild(frag,node);
+      } else if(node.nodeType===1){
+        walk(node);
+      }
+    });
+  }
+  walk(d.body);
+}
+function serialize(d){ return '<!doctype html>\n'+d.documentElement.outerHTML; }
+
+function buildRows(){
+  const host=document.getElementById('rows'); host.innerHTML='';
+  rows=[];
+  const slides=[...doc.querySelectorAll('.slide')]; slideCount=slides.length;
+  const els=[...doc.querySelectorAll('[data-i18n]')];
+  els.forEach(el=>{
+    const key=el.getAttribute('data-i18n');
+    const src=el.textContent;                          // pure text — never markup
+    const slide=slides.indexOf(el.closest('.slide'));
+    const row=document.createElement('div'); row.className='row';
+    row.innerHTML=`<div class="k">${key}</div><div class="src"></div>`;
+    row.querySelector('.src').textContent=src;
+    const ta=document.createElement('textarea'); ta.value=src; ta.spellcheck=false;
+    ta.addEventListener('input',()=>{
+      row.classList.toggle('done', ta.value!==src);
+      // live update the preview node with the same key (no Apply needed)
+      try{ const d=preview().contentDocument; const t=d&&d.querySelector('[data-i18n="'+CSS.escape(key)+'"]'); if(t) t.textContent=ta.value; }catch(e){}
+    });
+    row.appendChild(ta);
+    host.appendChild(row);
+    rows.push({key,el,src,ta,row,slide});
+  });
+  document.getElementById('apply').disabled = rows.length===0;
+  renderPreview(); applyFilter();
+}
+function renderPreview(){ const f=preview(); f.onload=startWatch; f.srcdoc=serialize(doc); }
+
+function curActive(){
+  try{ const d=preview().contentDocument; if(!d) return -1;
+    const sl=[...d.querySelectorAll('.slide')];
+    for(let i=0;i<sl.length;i++) if(sl[i].classList.contains('active')) return i;
+  }catch(e){}
+  return -1;
+}
+function startWatch(){
+  if(watchTimer) clearInterval(watchTimer);
+  watchTimer=setInterval(()=>{ const a=curActive(); if(a!==cur){ cur=a; applyFilter(); } }, 200);
+}
+function applyFilter(){
+  const q=(document.getElementById('search').value||'').toLowerCase();
+  const all=document.getElementById('showall').checked;
+  let shown=0;
+  rows.forEach(r=>{
+    const okSlide = all || cur<0 || r.slide===cur;
+    const okQ = !q || r.src.toLowerCase().includes(q) || r.ta.value.toLowerCase().includes(q) || r.key.includes(q);
+    const vis = okSlide && okQ; r.row.style.display=vis?'':'none'; if(vis) shown++;
+  });
+  document.getElementById('count').textContent = shown+(all?(' / '+rows.length):' on this slide');
+  document.getElementById('slidepos').textContent = slideCount? ('slide '+(cur+1)+' / '+slideCount) : 'slide –';
+}
+function navPreview(dir){
+  try{ const w=preview().contentWindow; const KE=w.KeyboardEvent||KeyboardEvent;
+    w.document.dispatchEvent(new KE('keydown',{key:dir<0?'ArrowLeft':'ArrowRight',bubbles:true})); }catch(e){}
+}
+
+document.getElementById('deckIn').addEventListener('change',async e=>{
+  const f=e.target.files[0]; if(!f) return;
+  baseName=f.name.replace(/\.html?$/i,'');
+  document.getElementById('fname').textContent=f.name;
+  doc=new DOMParser().parseFromString(await f.text(),'text/html');
+  keyDoc(doc);
+  buildRows();
+});
+document.getElementById('strIn').addEventListener('change',async e=>{
+  const f=e.target.files[0]; if(!f||!doc) { alert('Open a deck first.'); return; }
+  const map=JSON.parse(await f.text());
+  rows.forEach(r=>{ if(r.key in map){ r.ta.value=map[r.key]; r.ta.dispatchEvent(new Event('input',{bubbles:true})); } });
+  applyFilter();
+});
+function currentStrings(){ const m={}; rows.forEach(r=>m[r.key]=r.ta.value); return m; }
+function download(name, text, type){
+  const b=new Blob([text],{type}); const a=document.createElement('a');
+  a.href=URL.createObjectURL(b); a.download=name; a.click(); URL.revokeObjectURL(a.href);
+}
+document.getElementById('apply').addEventListener('click',()=>{
+  rows.forEach(r=>{ r.el.textContent=r.ta.value; });
+  renderPreview();
+  download(baseName.replace(/\.keyed$/,'')+'.translated.html', serialize(doc), 'text/html');
+});
+document.getElementById('exportStr').addEventListener('click',()=>{
+  if(!doc){ alert('Open a deck first.'); return; }
+  download('strings.json', JSON.stringify(currentStrings(),null,2), 'application/json');
+});
+document.getElementById('search').addEventListener('input',applyFilter);
+document.getElementById('showall').addEventListener('change',applyFilter);
+document.getElementById('prev').addEventListener('click',()=>navPreview(-1));
+document.getElementById('next').addEventListener('click',()=>navPreview(1));
+</script>
+</body></html>
