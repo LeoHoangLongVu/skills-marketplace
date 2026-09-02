@@ -1,0 +1,17 @@
+{
+  "name": "project-scaffold",
+  "version": "1.0.0",
+  "description": "Scaffold new projects from a strict engineering directory contract (CLAUDE.md map, ID registers, RTM) and enforce correct file placement for every artifact afterwards, including a PreToolUse hook that blocks illegal writes.",
+  "author": {
+    "name": "Long VH"
+  },
+  "homepage": "https://github.com/LeoHoangLongVu/skills-marketplace",
+  "keywords": [
+    "scaffold",
+    "project-structure",
+    "requirements",
+    "adr",
+    "traceability",
+    "governance"
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "skill_name": "project-scaffold",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "Set up a new project folder at <OUTPUT>\\asset-tracker for a tool called Asset Tracker. It's a Python 3.12 / FastAPI / PostgreSQL 16 internal tool for the facilities team to track laptop assignments across our offices. We follow a strict engineering repo layout - requirements with IDs, architecture decision records, a traceability matrix, that whole discipline. Owner is Long VH, we're in discovery, today is 2026-09-02, issue tracker is https://jira.example.com/projects/AT, and secrets live in 1Password Secrets Automation.",
+      "expected_output": "A project root carrying the full contract: CLAUDE.md with the directory map, look-alike table and ID scheme; both .claude/rules files; rtm.md; an index.md per ID register. No empty folders.",
+      "assertions": [
+        "CLAUDE.md exists at the project root",
+        "CLAUDE.md's directory map names all 18 top-level folders of the contract",
+        "CLAUDE.md carries the look-alike table that disambiguates confusable folders",
+        "CLAUDE.md carries the ID prefix table covering all 10 registers",
+        "No unfilled {{placeholder}} survives anywhere in the project",
+        "Both .claude/rules/documents.md and .claude/rules/code.md exist",
+        "requirements/traceability/rtm.md exists with all 7 contract columns",
+        "An index.md register exists for each of the 10 ID prefixes",
+        "The project's own stack, tracker and secret manager are filled in, not generic",
+        "No empty directory was created (structure stays lean)"
+      ],
+      "files": []
+    },
+    {
+      "id": 1,
+      "prompt": "Four artifacts to file into an existing contract repo: an OpenAPI 3.1 spec for the telemetry ingest API, a record of the decision to use Kafka over RabbitMQ, a risk about vendor v1 API deprecation in March 2027, and notes from the 2026-09-02 design review. Registers to be updated so nothing dangles.",
+      "expected_output": "OpenAPI in design/interfaces/; the Kafka decision as ADR-0002 in architecture/adr/; RISK-0001 in management/risks/; notes at management/reports/2026-09-02-*. Register rows added. Repo still audits clean.",
+      "assertions": [
+        "The OpenAPI spec is in design/interfaces/, not requirements/ or architecture/",
+        "The Kafka decision is an ADR under architecture/adr/, not a DEC",
+        "The new ADR takes the next free ID, ADR-0002, and is named ADR-0002-<kebab>.md",
+        "The risk is at management/risks/RISK-0001-<kebab>.md",
+        "The design review notes are in management/reports/ with a 2026-09-02- prefix",
+        "architecture/adr/index.md gained a row for the new ADR",
+        "management/risks/index.md gained a row for the new risk",
+        "Every new markdown document carries the required frontmatter fields",
+        "No new top-level directory was created",
+        "The whole repo passes check_path.py --audit with zero errors"
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Four data artifacts to place into an existing contract repo: the logical data model, the physical schema with indexes and ERD, the JSON Schema for the telemetry payload, and the first migration. Where does each go and why.",
+      "expected_output": "Logical model in architecture/data/; physical schema and ERD in design/database/; JSON Schema in data/schemas/; migration under src/ beside the owning service. Repo still audits clean.",
+      "assertions": [
+        "The logical data model is in architecture/data/",
+        "The physical schema and ERD are in design/database/",
+        "The JSON Schema is in data/schemas/",
+        "The migration is under src/ beside the owning service, not in design/ or data/",
+        "All four artifacts are in four different homes (none collapsed together)",
+        "No new top-level directory was created",
+        "The whole repo passes check_path.py --audit with zero errors"
+      ],
+      "files": []
+    }
+  ]
+}
